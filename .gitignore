@@ -1,0 +1,21 @@
+# Exclude everything by default
+*
+
+# But include the plugin directory and its contents
+!app/
+app/*
+!app/public/
+app/public/*
+!app/public/wp-content/
+app/public/wp-content/*
+!app/public/wp-content/plugins/
+app/public/wp-content/plugins/*
+!app/public/wp-content/plugins/gee-crm-main/
+!app/public/wp-content/plugins/gee-crm-main/**
+
+# Exclude common WordPress and system files
+.DS_Store
+*.log
+node_modules/
+conf/
+logs/
