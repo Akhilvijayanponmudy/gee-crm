@@ -23,9 +23,7 @@ class Gee_Woo_CRM_Ajax {
 
 		// 1. Sync Registered Users (Customers)
 		$users = get_users( array( 'role__in' => array( 'customer', 'subscriber' ) ) );
-
 		foreach ( $users as $user ) {
-
 			$data = array(
 				'email'      => $user->user_email,
 				'first_name' => $user->first_name,
@@ -33,7 +31,6 @@ class Gee_Woo_CRM_Ajax {
 				'phone'      => get_user_meta( $user->ID, 'billing_phone', true ),
 				'source'     => 'woocommerce',
 				'wp_user_id' => $user->ID,
-				'role'       => ! empty( $user->roles ) ? implode( ',', $user->roles ) : '',
 			);
 			$contact_model->create_or_update( $data );
 			$count++;
@@ -53,7 +50,6 @@ class Gee_Woo_CRM_Ajax {
 					'last_name'  => $order->get_billing_last_name(),
 					'phone'      => $order->get_billing_phone(),
 					'source'     => 'woocommerce_guest',
-					'role'       => ! empty( $user->roles ) ? implode( ',', $user->roles ) : '',
 					// 'wp_user_id' => null, // default
 				);
 				$contact_model->create_or_update( $data );

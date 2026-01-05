@@ -25,34 +25,15 @@ class Gee_Woo_CRM_Admin {
 			return;
 		}
 		wp_enqueue_style( 'gee-woo-crm-admin', GEE_WOO_CRM_URL . 'assets/css/admin.css', array(), GEE_WOO_CRM_VERSION, 'all' );
-
-        // If on segments page, enqueue selectWoo (WC standard)
-        $view = isset($_GET['view']) ? $_GET['view'] : '';
-        if ( 'segments' === $view && ( isset($_GET['action']) && in_array($_GET['action'], ['add', 'edit']) ) ) {
-            if ( function_exists( 'WC' ) ) {
-                wp_enqueue_style( 'select2', WC()->plugin_url() . '/assets/css/select2.css' );
-            }
-        }
 	}
 
 	public function enqueue_scripts( $hook ) {
 		if ( 'toplevel_page_gee-woo-crm' !== $hook ) {
 			return;
 		}
-		
-		$view = isset($_GET['view']) ? $_GET['view'] : '';
-        $deps = array( 'jquery' );
-
-        if ( 'segments' === $view && ( isset($_GET['action']) && in_array($_GET['action'], ['add', 'edit']) ) ) {
-            if ( function_exists( 'WC' ) ) {
-                wp_enqueue_script( 'selectWoo', WC()->plugin_url() . '/assets/js/selectWoo/selectWoo.full.min.js', array( 'jquery' ), '1.0.1', true );
-                $deps[] = 'selectWoo';
-            }
-        }
-
-        // Enqueue Chart.js only for dashboard if needed
+		// Enqueue Chart.js only for dashboard if needed, or globally for the SPA feel
 		wp_enqueue_script( 'chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', array(), '4.4.0', true );
-		wp_enqueue_script( 'gee-woo-crm-admin', GEE_WOO_CRM_URL . 'assets/js/admin.js', array_merge($deps, array('chart-js')), GEE_WOO_CRM_VERSION, true );
+		wp_enqueue_script( 'gee-woo-crm-admin', GEE_WOO_CRM_URL . 'assets/js/admin.js', array( 'jquery', 'chart-js' ), GEE_WOO_CRM_VERSION, true );
 		
 		wp_localize_script( 'gee-woo-crm-admin', 'geeWooCRM', array(
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),

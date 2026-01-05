@@ -2,12 +2,6 @@
 require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-contact.php';
 $contact_model = new Gee_Woo_CRM_Contact();
 
-require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-tag.php';
-$tag_model = new Gee_Woo_CRM_Tag();
-
-require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-segment.php';
-$segment_model = new Gee_Woo_CRM_Segment();
-
 $action = isset( $_GET['action'] ) ? sanitize_text_field( $_GET['action'] ) : 'list';
 $contact_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 
@@ -76,19 +70,6 @@ if ( 'view' === $action && $contact_id ) {
             <?php else : ?>
                 <p>No tags.</p>
             <?php endif; ?>
-
-            <h3>Segments</h3>
-            <?php 
-            $contact_segments = $segment_model->get_contact_segments( $contact_id );
-            if ( $contact_segments ) : ?>
-                <div style="display:flex; gap:10px;">
-                    <?php foreach ($contact_segments as $segment) : ?>
-                        <span style="background:#d1e7ff; color:#004085; padding:4px 8px; border-radius:4px; font-size:12px;"><?php echo esc_html($segment->name); ?></span>
-                    <?php endforeach; ?>
-                </div>
-            <?php else : ?>
-                <p>No segments.</p>
-            <?php endif; ?>
             
             <div style="margin-top:10px;">
                 <?php $all_tags = $tag_model->get_tags(); ?>
@@ -129,6 +110,8 @@ if ( 'view' === $action && $contact_id ) {
 
 } else {
 	// List View //
+    require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-segment.php';
+    $segment_model = new Gee_Woo_CRM_Segment();
     $segments = $segment_model->get_segments();
 
 	$search = isset( $_GET['s'] ) ? sanitize_text_field( $_GET['s'] ) : '';
@@ -175,7 +158,6 @@ if ( 'view' === $action && $contact_id ) {
 					<th>Email</th>
 					<th>Status</th>
 					<th>Source</th>
-                    <th>Tags & Segments</th>
 					<th>Created</th>
 					<th>Actions</th>
 				</tr>
@@ -192,27 +174,6 @@ if ( 'view' === $action && $contact_id ) {
 							<td><?php echo esc_html( $contact->email ); ?></td>
 							<td><?php echo esc_html( ucfirst( $contact->status ) ); ?></td>
 							<td><?php echo esc_html( $contact->source ); ?></td>
-                            <td>
-                                <?php 
-                                $contact_tags = $tag_model->get_contact_tags( $contact->id );
-                                if ( $contact_tags ) : ?>
-                                    <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:4px;">
-                                        <?php foreach ( $contact_tags as $t ) : ?>
-                                            <span style="background:#e5dafc; color:#4e28a5; padding:2px 6px; border-radius:3px; font-size:11px;" title="Tag"><?php echo esc_html( $t->name ); ?></span>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php endif; ?>
-
-                                <?php 
-                                $contact_segments = $segment_model->get_contact_segments( $contact->id );
-                                if ( $contact_segments ) : ?>
-                                    <div style="display:flex; flex-wrap:wrap; gap:4px;">
-                                        <?php foreach ( $contact_segments as $s ) : ?>
-                                            <span style="background:#d1e7ff; color:#004085; padding:2px 6px; border-radius:3px; font-size:11px;" title="Segment"><?php echo esc_html( $s->name ); ?></span>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php endif; ?>
-                            </td>
 							<td><?php echo date( 'Y-m-d', strtotime( $contact->created_at ) ); ?></td>
 							<td>
 								<a href="?page=gee-woo-crm&view=contacts&action=view&id=<?php echo $contact->id; ?>" class="gee-crm-btn">View</a>
@@ -221,7 +182,7 @@ if ( 'view' === $action && $contact_id ) {
 					<?php endforeach; ?>
 				<?php else : ?>
 					<tr>
-						<td colspan="7">No contacts found. Have you synced WooCommerce?</td>
+						<td colspan="6">No contacts found. Have you synced WooCommerce?</td>
 					</tr>
 				<?php endif; ?>
 			</tbody>

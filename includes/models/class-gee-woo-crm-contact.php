@@ -36,7 +36,7 @@ class Gee_Woo_CRM_Contact {
 					'first_name' => $data['first_name'],
 					'last_name'  => $data['last_name'],
 					'phone'      => $data['phone'],
-					'status'     => $data['role'],
+					'status'     => 'subscribed',
 					'source'     => $data['source'],
 					'wp_user_id' => isset($data['wp_user_id']) ? $data['wp_user_id'] : null,
 					'created_at' => current_time( 'mysql' ),

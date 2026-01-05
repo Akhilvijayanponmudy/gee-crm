@@ -52,14 +52,4 @@ class Gee_Woo_CRM_Tag {
             array( '%d', '%d' )
         );
     }
-
-    public function get_contact_tags( $contact_id ) {
-        global $wpdb;
-        return $wpdb->get_results( $wpdb->prepare( "
-            SELECT t.* 
-            FROM $this->table_name t
-            INNER JOIN $this->pivot_table ct ON ct.tag_id = t.id
-            WHERE ct.contact_id = %d
-        ", $contact_id ) );
-    }
 }
