@@ -243,6 +243,11 @@ if ( 'view' === $action && $contact_id ) {
 	$total_pages = ceil( $total_contacts / $per_page );
 	?>
 	<div class="gee-crm-card">
+		<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+			<h2>Contacts</h2>
+			<button type="button" id="gee-import-contacts-btn" class="gee-crm-btn gee-crm-btn-primary">Import Contacts</button>
+		</div>
+		
 		<div class="tablenav top" style="display:flex; justify-content:space-between; align-items:center;">
 			<form method="get">
 				<input type="hidden" name="page" value="gee-woo-crm" />
@@ -622,6 +627,181 @@ if ( 'view' === $action && $contact_id ) {
 
 				processNext();
 			}
+		});
+		</script>
+		
+		<!-- Import Contacts Modal -->
+		<div id="gee-import-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:10000; align-items:center; justify-content:center;">
+			<div style="background:#fff; padding:30px; border-radius:8px; max-width:600px; width:90%; max-height:90vh; overflow-y:auto;">
+				<h2 style="margin-top:0;">Import Contacts</h2>
+				
+				<!-- Import Type Selection -->
+				<div style="margin-bottom:20px;">
+					<label style="display:block; margin-bottom:10px;"><strong>Import From:</strong></label>
+					<label style="display:block; margin-bottom:10px; padding:10px; border:2px solid #ddd; border-radius:4px; cursor:pointer;">
+						<input type="radio" name="import_type" value="woocommerce" style="margin-right:10px;">
+						<strong>WooCommerce</strong> - Import registered users and guest orders
+					</label>
+					<label style="display:block; padding:10px; border:2px solid #ddd; border-radius:4px; cursor:pointer;">
+						<input type="radio" name="import_type" value="csv" checked style="margin-right:10px;">
+						<strong>CSV File</strong> - Upload a CSV file
+					</label>
+				</div>
+				
+				<!-- WooCommerce Import Section -->
+				<div id="woocommerce-import-section" style="display:none; margin-bottom:20px; padding:15px; background:#f8f9fa; border-radius:4px;">
+					<p style="color:#666; margin-bottom:15px;">
+						Import customers from WooCommerce (Registered Users + Guest Orders). This will sync all WooCommerce customers and guest order contacts.
+					</p>
+					<div id="woocommerce-import-progress" style="display:none; margin:15px 0;">
+						<div style="background:#f0f0f0; border-radius:4px; padding:10px;">
+							<div id="woocommerce-import-status" style="color:#666; margin-bottom:5px;">Syncing...</div>
+							<div style="background:#fff; border-radius:4px; height:20px; overflow:hidden;">
+								<div id="woocommerce-import-progress-bar" style="background:#4e28a5; height:100%; width:0%; transition:width 0.3s;"></div>
+							</div>
+						</div>
+					</div>
+					<button type="button" id="woocommerce-import-btn" class="gee-crm-btn gee-crm-btn-primary">Import from WooCommerce</button>
+				</div>
+				
+				<!-- CSV Import Section -->
+				<div id="csv-import-section">
+					<p style="color:#666; margin-bottom:15px;">Upload a CSV file to import contacts. The CSV should have columns: email, first_name, last_name, phone (optional), marketing_consent (0 or 1).</p>
+					
+					<form id="gee-import-form" enctype="multipart/form-data">
+						<?php wp_nonce_field( 'gee_import_contacts', 'import_nonce' ); ?>
+						<p>
+							<label><strong>CSV File:</strong></label><br>
+							<input type="file" name="csv_file" id="csv-file-input" accept=".csv" required style="margin-top:5px;">
+						</p>
+						<p>
+							<label>
+								<input type="checkbox" name="skip_duplicates" value="1" checked>
+								Skip duplicate emails (update existing contacts)
+							</label>
+						</p>
+						<p>
+							<label>
+								<input type="checkbox" name="marketing_consent_default" value="1">
+								Set marketing consent to "Yes" for all imported contacts (if not specified in CSV)
+							</label>
+						</p>
+						<div id="import-progress" style="display:none; margin:15px 0;">
+							<div style="background:#f0f0f0; border-radius:4px; padding:10px;">
+								<div id="import-status" style="color:#666; margin-bottom:5px;">Processing...</div>
+								<div style="background:#fff; border-radius:4px; height:20px; overflow:hidden;">
+									<div id="import-progress-bar" style="background:#4e28a5; height:100%; width:0%; transition:width 0.3s;"></div>
+								</div>
+							</div>
+						</div>
+						<div style="margin-top:20px;">
+							<button type="submit" class="gee-crm-btn gee-crm-btn-primary">Import Contacts</button>
+						</div>
+					</form>
+				</div>
+				
+				<div style="margin-top:20px;">
+					<button type="button" class="gee-crm-btn" onclick="document.getElementById('gee-import-modal').style.display='none';">Cancel</button>
+				</div>
+			</div>
+		</div>
+		
+		<script>
+		jQuery(document).ready(function($) {
+			$('#gee-import-contacts-btn').on('click', function() {
+				$('#gee-import-modal').css('display', 'flex');
+			});
+			
+			// Handle import type selection
+			$('input[name="import_type"]').on('change', function() {
+				if ($(this).val() === 'woocommerce') {
+					$('#woocommerce-import-section').show();
+					$('#csv-import-section').hide();
+					$('#csv-file-input').removeAttr('required');
+				} else {
+					$('#woocommerce-import-section').hide();
+					$('#csv-import-section').show();
+					$('#csv-file-input').attr('required', 'required');
+				}
+			});
+			
+			// WooCommerce import button
+			$('#woocommerce-import-btn').on('click', function() {
+				var $btn = $(this);
+				var $progress = $('#woocommerce-import-progress');
+				var $status = $('#woocommerce-import-status');
+				var $progressBar = $('#woocommerce-import-progress-bar');
+				
+				$btn.prop('disabled', true).text('Importing...');
+				$progress.show();
+				$status.text('Starting import from WooCommerce...');
+				$progressBar.css('width', '10%');
+				
+				$.ajax({
+					url: geeWooCRM.ajaxurl,
+					type: 'POST',
+					data: {
+						action: 'gee_crm_sync_contacts',
+						nonce: geeWooCRM.nonce
+					},
+					success: function(response) {
+						$progressBar.css('width', '100%');
+						if (response.success) {
+							$status.html('<strong style="color:#28a745;">' + response.data.message + '</strong>');
+							setTimeout(function() {
+								$('#gee-import-modal').hide();
+								location.reload();
+							}, 2000);
+						} else {
+							$status.html('<strong style="color:#dc3545;">Error: ' + (response.data || 'Unknown error') + '</strong>');
+							$btn.prop('disabled', false).text('Import from WooCommerce');
+						}
+					},
+					error: function() {
+						$progressBar.css('width', '100%');
+						$status.html('<strong style="color:#dc3545;">Import failed. Please try again.</strong>');
+						$btn.prop('disabled', false).text('Import from WooCommerce');
+					}
+				});
+			});
+			
+			$('#gee-import-form').on('submit', function(e) {
+				e.preventDefault();
+				
+				var formData = new FormData(this);
+				formData.append('action', 'gee_import_contacts');
+				formData.append('nonce', geeWooCRM.nonce);
+				
+				$('#import-progress').show();
+				$('#import-status').text('Uploading and processing CSV file...');
+				$('#import-progress-bar').css('width', '10%');
+				
+				$.ajax({
+					url: geeWooCRM.ajaxurl,
+					type: 'POST',
+					data: formData,
+					processData: false,
+					contentType: false,
+					xhr: function() {
+						var xhr = new window.XMLHttpRequest();
+						return xhr;
+					},
+					success: function(response) {
+						$('#import-progress-bar').css('width', '100%');
+						if (response.success) {
+							$('#import-status').html('<strong style="color:#28a745;">' + response.data.message + '</strong>');
+							setTimeout(function() {
+								location.reload();
+							}, 2000);
+						} else {
+							$('#import-status').html('<strong style="color:#dc3545;">Error: ' + (response.data || 'Unknown error') + '</strong>');
+						}
+					},
+					error: function() {
+						$('#import-status').html('<strong style="color:#dc3545;">Upload failed. Please try again.</strong>');
+					}
+				});
+			});
 		});
 		</script>
 	</div>

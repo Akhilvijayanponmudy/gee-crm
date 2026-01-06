@@ -9,7 +9,7 @@
 
 .gee-woo-crm-sidebar {
 	width: 220px;
-	background: #1e1e1e; /* Dark sidebar like FluentCRM */
+	background: #1e1e1e;
 	color: #fff;
 	flex-shrink: 0;
 	display: flex;

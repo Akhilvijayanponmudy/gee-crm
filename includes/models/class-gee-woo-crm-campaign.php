@@ -286,7 +286,9 @@ class Gee_Woo_CRM_Campaign {
      */
     private function replace_variables( $content, $contact ) {
         require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-contact.php';
+        require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-email-template.php';
         $contact_model = new Gee_Woo_CRM_Contact();
+        $template_model = new Gee_Woo_CRM_Email_Template();
         
         // Get WooCommerce data if available
         $total_spent = '$0.00';
@@ -329,7 +331,7 @@ class Gee_Woo_CRM_Campaign {
             '{site_name}' => get_bloginfo( 'name' ),
             '{site_url}' => home_url(),
             '{current_date}' => date( 'F j, Y' ),
-            '{unsubscribe_link}' => home_url( '/unsubscribe?email=' . urlencode( $contact->email ) ),
+            '{unsubscribe_link}' => home_url( '/wp-json/gee-crm/v1/unsubscribe?email=' . urlencode( $contact->email ) ),
         );
         
         return str_replace( array_keys( $replacements ), array_values( $replacements ), $content );

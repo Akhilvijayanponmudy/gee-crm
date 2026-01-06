@@ -65,8 +65,14 @@ class Gee_Woo_CRM_Admin {
 					<li class="<?php echo $page === 'campaigns' ? 'active' : ''; ?>">
 						<a href="?page=gee-woo-crm&view=campaigns"><span class="dashicons dashicons-megaphone"></span> Campaigns</a>
 					</li>
+					<li class="<?php echo $page === 'analytics' ? 'active' : ''; ?>">
+						<a href="?page=gee-woo-crm&view=analytics"><span class="dashicons dashicons-chart-bar"></span> Analytics</a>
+					</li>
 					<li class="<?php echo $page === 'email-templates' ? 'active' : ''; ?>">
 						<a href="?page=gee-woo-crm&view=email-templates"><span class="dashicons dashicons-email"></span> Email Templates</a>
+					</li>
+					<li class="<?php echo $page === 'mail' ? 'active' : ''; ?>">
+						<a href="?page=gee-woo-crm&view=mail"><span class="dashicons dashicons-email-alt2"></span> Mail</a>
 					</li>
 					<li class="<?php echo $page === 'settings' ? 'active' : ''; ?>">
 						<a href="?page=gee-woo-crm&view=settings"><span class="dashicons dashicons-admin-settings"></span> Settings</a>
@@ -76,7 +82,20 @@ class Gee_Woo_CRM_Admin {
 
 			<div class="gee-woo-crm-main">
 				<div class="gee-woo-crm-header">
-					<h1><?php echo ucfirst( $page ); ?></h1>
+					<h1><?php 
+						$page_titles = array(
+							'dashboard' => 'Dashboard',
+							'contacts' => 'Contacts',
+							'tags' => 'Tags',
+							'segments' => 'Segments',
+							'campaigns' => 'Campaigns',
+							'analytics' => 'Analytics',
+							'email-templates' => 'Email Templates',
+							'mail' => 'Mail',
+							'settings' => 'Settings'
+						);
+						echo isset( $page_titles[$page] ) ? $page_titles[$page] : ucfirst( $page ); 
+					?></h1>
 				</div>
 				<div class="gee-woo-crm-content">
 					<?php $this->render_view( $page ); ?>

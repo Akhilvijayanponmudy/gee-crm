@@ -11,6 +11,7 @@ class Gee_Woo_CRM_Ajax {
         add_action( 'wp_ajax_gee_crm_remove_tag', array( $this, 'remove_tag' ) );
         add_action( 'wp_ajax_gee_get_template', array( $this, 'get_template' ) );
         add_action( 'wp_ajax_gee_update_marketing_consent', array( $this, 'update_marketing_consent' ) );
+        add_action( 'wp_ajax_gee_import_contacts', array( $this, 'import_contacts' ) );
 	}
 
 	public function sync_contacts() {
@@ -193,6 +194,109 @@ class Gee_Woo_CRM_Ajax {
         wp_send_json_success( array( 
             'message' => $consent ? 'Marketing consent granted' : 'Marketing consent revoked',
             'consent_date' => $consent ? current_time( 'mysql' ) : null
+        ) );
+    }
+
+    public function import_contacts() {
+        check_ajax_referer( 'gee_woo_crm_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( 'Forbidden' );
+
+        if ( ! isset( $_FILES['csv_file'] ) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK ) {
+            wp_send_json_error( 'No file uploaded or upload error' );
+        }
+
+        $file = $_FILES['csv_file']['tmp_name'];
+        $skip_duplicates = isset( $_POST['skip_duplicates'] ) && $_POST['skip_duplicates'] == '1';
+        $marketing_consent_default = isset( $_POST['marketing_consent_default'] ) && $_POST['marketing_consent_default'] == '1';
+
+        require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-contact.php';
+        $contact_model = new Gee_Woo_CRM_Contact();
+
+        $handle = fopen( $file, 'r' );
+        if ( $handle === false ) {
+            wp_send_json_error( 'Could not open CSV file' );
+        }
+
+        // Read header row
+        $headers = fgetcsv( $handle );
+        if ( ! $headers || ! in_array( 'email', $headers ) ) {
+            fclose( $handle );
+            wp_send_json_error( 'CSV must have an "email" column' );
+        }
+
+        $imported = 0;
+        $updated = 0;
+        $skipped = 0;
+        $errors = array();
+
+        while ( ( $row = fgetcsv( $handle ) ) !== false ) {
+            if ( count( $row ) !== count( $headers ) ) {
+                continue; // Skip malformed rows
+            }
+
+            $data = array_combine( $headers, $row );
+            
+            $email = sanitize_email( $data['email'] );
+            if ( empty( $email ) || ! is_email( $email ) ) {
+                $skipped++;
+                continue;
+            }
+
+            // Check if contact exists
+            global $wpdb;
+            $exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}gee_crm_contacts WHERE email = %s", $email ) );
+
+            if ( $exists && ! $skip_duplicates ) {
+                $skipped++;
+                continue;
+            }
+
+            $contact_data = array(
+                'email' => $email,
+                'first_name' => isset( $data['first_name'] ) ? sanitize_text_field( $data['first_name'] ) : '',
+                'last_name' => isset( $data['last_name'] ) ? sanitize_text_field( $data['last_name'] ) : '',
+                'phone' => isset( $data['phone'] ) ? sanitize_text_field( $data['phone'] ) : '',
+                'source' => 'csv_import',
+            );
+
+            // Handle marketing consent
+            if ( isset( $data['marketing_consent'] ) ) {
+                $contact_data['marketing_consent'] = ( $data['marketing_consent'] == '1' || strtolower( $data['marketing_consent'] ) == 'yes' );
+            } elseif ( $marketing_consent_default ) {
+                $contact_data['marketing_consent'] = true;
+            }
+
+            try {
+                $contact_id = $contact_model->create_or_update( $contact_data );
+                if ( $exists ) {
+                    $updated++;
+                } else {
+                    $imported++;
+                }
+            } catch ( Exception $e ) {
+                $errors[] = $email . ': ' . $e->getMessage();
+            }
+        }
+
+        fclose( $handle );
+
+        $message = sprintf( 
+            'Import completed! %d imported, %d updated, %d skipped.',
+            $imported,
+            $updated,
+            $skipped
+        );
+
+        if ( ! empty( $errors ) ) {
+            $message .= ' ' . count( $errors ) . ' errors occurred.';
+        }
+
+        wp_send_json_success( array( 
+            'message' => $message,
+            'imported' => $imported,
+            'updated' => $updated,
+            'skipped' => $skipped,
+            'errors' => $errors
         ) );
     }
 }
