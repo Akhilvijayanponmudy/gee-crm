@@ -32,4 +32,24 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    // Dropdown Menu Toggle
+    $('.gee-woo-crm-nav-dropdown > .gee-woo-crm-nav-item').on('click', function(e) {
+        e.preventDefault();
+        var $dropdown = $(this).parent();
+        var $menu = $dropdown.find('.gee-woo-crm-dropdown-menu');
+        
+        // Close other dropdowns
+        $('.gee-woo-crm-dropdown-menu').not($menu).hide();
+        
+        // Toggle current dropdown
+        $menu.toggle();
+    });
+
+    // Close dropdown when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.gee-woo-crm-nav-dropdown').length) {
+            $('.gee-woo-crm-dropdown-menu').hide();
+        }
+    });
+
 });
