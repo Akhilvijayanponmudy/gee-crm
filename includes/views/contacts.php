@@ -30,7 +30,7 @@ if ( 'view' === $action && $contact_id ) {
 
         // Tags
         $tags = $wpdb->get_results( $wpdb->prepare( "
-            SELECT t.name 
+            SELECT t.id, t.name 
             FROM {$wpdb->prefix}gee_crm_tags t
             INNER JOIN {$wpdb->prefix}gee_crm_contact_tags ct ON ct.tag_id = t.id
             WHERE ct.contact_id = %d
@@ -47,6 +47,25 @@ if ( 'view' === $action && $contact_id ) {
 			<p><strong>Phone:</strong> <?php echo esc_html( $contact->phone ); ?></p>
 			<p><strong>Source:</strong> <?php echo esc_html( $contact->source ); ?></p>
             <p><strong>Joined:</strong> <?php echo esc_html( $contact->created_at ); ?></p>
+            
+            <div style="margin-top:20px; padding:15px; background:#f8f9fa; border-radius:4px;">
+                <h3 style="margin-top:0;">Marketing Email Consent</h3>
+                <p>
+                    <label>
+                        <input type="checkbox" id="marketing-consent-toggle" data-contact-id="<?php echo $contact_id; ?>" <?php checked( ! empty( $contact->marketing_consent ), true ); ?>>
+                        <strong>User has consented to receive marketing emails</strong>
+                    </label>
+                </p>
+                <?php if ( ! empty( $contact->consent_date ) ) : ?>
+                    <p style="color:#666; font-size:13px; margin-top:10px;">
+                        <strong>Consent Date:</strong> <?php echo date( 'F j, Y g:i A', strtotime( $contact->consent_date ) ); ?>
+                    </p>
+                <?php else : ?>
+                    <p style="color:#999; font-size:13px; margin-top:10px;">
+                        <em>No consent recorded. This contact will NOT receive marketing campaigns.</em>
+                    </p>
+                <?php endif; ?>
+            </div>
             
             <hr>
             
@@ -66,10 +85,12 @@ if ( 'view' === $action && $contact_id ) {
             <?php if ( $tags ) : ?>
                 <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
                     <?php foreach ($tags as $tag) : ?>
-                        <span class="gee-tag-badge" style="background:#e5dafc; color:#4e28a5; padding:4px 8px; border-radius:4px; font-size:12px; display:inline-flex; align-items:center; gap:5px;">
-                            <?php echo esc_html($tag->name); ?>
-                            <button class="gee-remove-tag-btn" data-contact-id="<?php echo $contact_id; ?>" data-tag-id="<?php echo $tag->id; ?>" style="background:none; border:none; color:#4e28a5; cursor:pointer; font-size:14px; padding:0; margin:0; line-height:1;" title="Remove tag">×</button>
-                        </span>
+                        <?php if ( isset( $tag->id ) && isset( $tag->name ) ) : ?>
+                            <span class="gee-tag-badge" style="background:#e5dafc; color:#4e28a5; padding:4px 8px; border-radius:4px; font-size:12px; display:inline-flex; align-items:center; gap:5px;">
+                                <?php echo esc_html($tag->name); ?>
+                                <button class="gee-remove-tag-btn" data-contact-id="<?php echo $contact_id; ?>" data-tag-id="<?php echo $tag->id; ?>" style="background:none; border:none; color:#4e28a5; cursor:pointer; font-size:14px; padding:0; margin:0; line-height:1;" title="Remove tag">×</button>
+                            </span>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
             <?php else : ?>
@@ -81,9 +102,11 @@ if ( 'view' === $action && $contact_id ) {
                 $all_tags = $tag_model->get_tags();
                 // Filter out already assigned tags
                 $assigned_tag_ids = array();
-                if ( $tags ) {
+                if ( $tags && is_array( $tags ) ) {
                     foreach ( $tags as $tag ) {
-                        $assigned_tag_ids[] = $tag->id;
+                        if ( isset( $tag->id ) ) {
+                            $assigned_tag_ids[] = $tag->id;
+                        }
                     }
                 }
                 ?>
@@ -140,6 +163,34 @@ if ( 'view' === $action && $contact_id ) {
                         } else {
                             alert(res.data);
                         }
+                    });
+                });
+                
+                // Marketing consent toggle
+                $('#marketing-consent-toggle').on('change', function() {
+                    var contact_id = $(this).data('contact-id');
+                    var consent = $(this).is(':checked') ? 1 : 0;
+                    var $checkbox = $(this);
+                    
+                    $checkbox.prop('disabled', true);
+                    
+                    $.post(geeWooCRM.ajaxurl, {
+                        action: 'gee_update_marketing_consent',
+                        nonce: geeWooCRM.nonce,
+                        contact_id: contact_id,
+                        consent: consent
+                    }, function(res) {
+                        $checkbox.prop('disabled', false);
+                        if(res.success) {
+                            location.reload(); // Reload to show updated consent date
+                        } else {
+                            alert('Failed to update marketing consent: ' + (res.data || 'Unknown error'));
+                            $checkbox.prop('checked', !consent); // Revert checkbox
+                        }
+                    }).fail(function() {
+                        $checkbox.prop('disabled', false);
+                        $checkbox.prop('checked', !consent); // Revert checkbox
+                        alert('Failed to update marketing consent. Please try again.');
                     });
                 });
             });
@@ -245,6 +296,7 @@ if ( 'view' === $action && $contact_id ) {
 					<th>Name</th>
 					<th>Email</th>
 					<th>Status</th>
+					<th>Marketing Consent</th>
 					<th>Source</th>
 					<th>Tags</th>
 					<th>Segments</th>
@@ -289,6 +341,16 @@ if ( 'view' === $action && $contact_id ) {
                             </td>
 							<td><?php echo esc_html( $contact->email ); ?></td>
 							<td><?php echo esc_html( ucfirst( $contact->status ) ); ?></td>
+						<td>
+							<?php if ( ! empty( $contact->marketing_consent ) ) : ?>
+								<span style="color:#28a745; font-weight:600;">✓ Yes</span>
+								<?php if ( ! empty( $contact->consent_date ) ) : ?>
+									<br><small style="color:#666;"><?php echo date( 'M j, Y', strtotime( $contact->consent_date ) ); ?></small>
+								<?php endif; ?>
+							<?php else : ?>
+								<span style="color:#dc3545;">✗ No</span>
+							<?php endif; ?>
+						</td>
 							<td><?php echo esc_html( $contact->source ); ?></td>
 							<td>
 								<?php if ( $contact_tags ) : ?>

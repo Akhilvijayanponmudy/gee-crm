@@ -65,6 +65,9 @@ class Gee_Woo_CRM_Admin {
 					<li class="<?php echo $page === 'campaigns' ? 'active' : ''; ?>">
 						<a href="?page=gee-woo-crm&view=campaigns"><span class="dashicons dashicons-megaphone"></span> Campaigns</a>
 					</li>
+					<li class="<?php echo $page === 'email-templates' ? 'active' : ''; ?>">
+						<a href="?page=gee-woo-crm&view=email-templates"><span class="dashicons dashicons-email"></span> Email Templates</a>
+					</li>
 					<li class="<?php echo $page === 'settings' ? 'active' : ''; ?>">
 						<a href="?page=gee-woo-crm&view=settings"><span class="dashicons dashicons-admin-settings"></span> Settings</a>
 					</li>

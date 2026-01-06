@@ -9,6 +9,8 @@ class Gee_Woo_CRM_Ajax {
         add_action( 'wp_ajax_gee_crm_delete_tag', array( $this, 'delete_tag' ) );
         add_action( 'wp_ajax_gee_crm_assign_tag', array( $this, 'assign_tag' ) );
         add_action( 'wp_ajax_gee_crm_remove_tag', array( $this, 'remove_tag' ) );
+        add_action( 'wp_ajax_gee_get_template', array( $this, 'get_template' ) );
+        add_action( 'wp_ajax_gee_update_marketing_consent', array( $this, 'update_marketing_consent' ) );
 	}
 
 	public function sync_contacts() {
@@ -148,5 +150,49 @@ class Gee_Woo_CRM_Ajax {
         $model->remove_tag( $contact_id, $tag_id );
 
         wp_send_json_success( array( 'message' => 'Tag removed' ) );
+    }
+
+    public function get_template() {
+        check_ajax_referer( 'gee_get_template', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( 'Forbidden' );
+
+        $template_id = isset( $_POST['template_id'] ) ? absint( $_POST['template_id'] ) : 0;
+        if ( ! $template_id ) wp_send_json_error( 'Template ID required' );
+
+        require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-email-template.php';
+        $template_model = new Gee_Woo_CRM_Email_Template();
+        $template = $template_model->get_template( $template_id );
+
+        if ( ! $template ) {
+            wp_send_json_error( 'Template not found' );
+        }
+
+        wp_send_json_success( array(
+            'subject' => $template->subject,
+            'content_html' => $template->content_html
+        ) );
+    }
+
+    public function update_marketing_consent() {
+        check_ajax_referer( 'gee_woo_crm_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( 'Forbidden' );
+
+        $contact_id = isset( $_POST['contact_id'] ) ? absint( $_POST['contact_id'] ) : 0;
+        $consent = isset( $_POST['consent'] ) && $_POST['consent'] == '1' ? true : false;
+
+        if ( ! $contact_id ) wp_send_json_error( 'Contact ID required' );
+
+        require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-contact.php';
+        $contact_model = new Gee_Woo_CRM_Contact();
+        $result = $contact_model->update_marketing_consent( $contact_id, $consent );
+
+        if ( $result === false ) {
+            wp_send_json_error( 'Failed to update marketing consent' );
+        }
+
+        wp_send_json_success( array( 
+            'message' => $consent ? 'Marketing consent granted' : 'Marketing consent revoked',
+            'consent_date' => $consent ? current_time( 'mysql' ) : null
+        ) );
     }
 }
