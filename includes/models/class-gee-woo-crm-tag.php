@@ -35,6 +35,37 @@ class Gee_Woo_CRM_Tag {
         return $wpdb->insert_id;
     }
 
+    public function update_tag( $id, $name ) {
+        global $wpdb;
+        $slug = sanitize_title( $name );
+        
+        // Check if slug already exists for a different tag
+        $exists = $wpdb->get_var( $wpdb->prepare( 
+            "SELECT id FROM $this->table_name WHERE slug = %s AND id != %d", 
+            $slug, 
+            $id 
+        ) );
+        if ( $exists ) {
+            return new WP_Error( 'exists', 'A tag with this name already exists.' );
+        }
+
+        return $wpdb->update(
+            $this->table_name,
+            array(
+                'name' => sanitize_text_field( $name ),
+                'slug' => $slug
+            ),
+            array( 'id' => $id ),
+            array( '%s', '%s' ),
+            array( '%d' )
+        );
+    }
+
+    public function get_tag( $id ) {
+        global $wpdb;
+        return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE id = %d", $id ) );
+    }
+
     public function delete_tag( $id ) {
         global $wpdb;
         $wpdb->delete( $this->pivot_table, array( 'tag_id' => $id ) ); // Delete associations first
@@ -43,7 +74,33 @@ class Gee_Woo_CRM_Tag {
 
     public function assign_tag( $contact_id, $tag_id ) {
         global $wpdb;
+        
+        // Check if tag is already assigned to prevent duplicate key errors
+        $exists = $wpdb->get_var( $wpdb->prepare(
+            "SELECT contact_id FROM $this->pivot_table WHERE contact_id = %d AND tag_id = %d",
+            $contact_id,
+            $tag_id
+        ) );
+        
+        if ( $exists ) {
+            return false; // Already assigned
+        }
+        
         $wpdb->insert(
+            $this->pivot_table,
+            array(
+                'contact_id' => $contact_id,
+                'tag_id'     => $tag_id
+            ),
+            array( '%d', '%d' )
+        );
+        
+        return $wpdb->insert_id;
+    }
+
+    public function remove_tag( $contact_id, $tag_id ) {
+        global $wpdb;
+        return $wpdb->delete(
             $this->pivot_table,
             array(
                 'contact_id' => $contact_id,
