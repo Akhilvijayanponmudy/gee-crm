@@ -155,7 +155,23 @@ if ( $action == 'view' && isset( $_GET['id'] ) ) {
         </div>
         
         <div style="background:#f8f9fa; padding:15px; border-radius:4px; margin-bottom:20px;">
-        <p><strong>Subject:</strong> <?php echo esc_html( $campaign->subject ); ?></p>
+        <p><strong>Subject:</strong> 
+                <?php 
+                // Show preview with sample data
+                $preview_subject = $campaign->subject;
+                $preview_subject = str_replace( '{first_name}', 'John', $preview_subject );
+                $preview_subject = str_replace( '{last_name}', 'Doe', $preview_subject );
+                $preview_subject = str_replace( '{full_name}', 'John Doe', $preview_subject );
+                $preview_subject = str_replace( '{email}', 'john.doe@example.com', $preview_subject );
+                $preview_subject = str_replace( '{site_name}', get_bloginfo( 'name' ), $preview_subject );
+                $preview_subject = str_replace( '{site_url}', home_url(), $preview_subject );
+                $preview_subject = str_replace( '{current_date}', date( 'F j, Y' ), $preview_subject );
+                echo esc_html( $preview_subject );
+                ?>
+                <?php if ( strpos( $campaign->subject, '{' ) !== false ) : ?>
+                    <br><small style="color:#666; font-style:italic;">Preview with sample data (variables will be replaced when sent)</small>
+                <?php endif; ?>
+            </p>
             <p><strong>Status:</strong> <span style="text-transform:capitalize;"><?php echo esc_html( $campaign->status ); ?></span></p>
             <p><strong>Created:</strong> <?php echo $campaign->created_at ? date( 'F j, Y g:i A', strtotime( $campaign->created_at ) ) : 'N/A'; ?></p>
             <?php if ( $campaign->sent_at ) : ?>
@@ -712,7 +728,23 @@ if ( $action == 'view' && isset( $_GET['id'] ) ) {
                         ?>
                         <tr>
                             <td><strong><?php echo esc_html( $c->name ); ?></strong></td>
-                            <td><?php echo esc_html( $c->subject ); ?></td>
+                            <td>
+                                <?php 
+                                // Show preview with sample data for template variables
+                                $preview_subject = $c->subject;
+                                $preview_subject = str_replace( '{first_name}', 'John', $preview_subject );
+                                $preview_subject = str_replace( '{last_name}', 'Doe', $preview_subject );
+                                $preview_subject = str_replace( '{full_name}', 'John Doe', $preview_subject );
+                                $preview_subject = str_replace( '{email}', 'john.doe@example.com', $preview_subject );
+                                $preview_subject = str_replace( '{site_name}', get_bloginfo( 'name' ), $preview_subject );
+                                $preview_subject = str_replace( '{site_url}', home_url(), $preview_subject );
+                                $preview_subject = str_replace( '{current_date}', date( 'F j, Y' ), $preview_subject );
+                                echo esc_html( $preview_subject );
+                                ?>
+                                <?php if ( strpos( $c->subject, '{' ) !== false ) : ?>
+                                    <br><small style="color:#999; font-size:11px;">(Preview)</small>
+                                <?php endif; ?>
+                            </td>
                             <td><?php echo number_format( $c->total_recipients ?: $stats['total'] ); ?></td>
                             <td>
                                 <span style="padding:4px 8px; border-radius:3px; font-size:12px; background:<?php echo $status_color; ?>; color:#fff; text-transform:capitalize;">
