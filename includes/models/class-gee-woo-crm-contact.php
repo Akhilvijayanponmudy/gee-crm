@@ -50,32 +50,47 @@ class Gee_Woo_CRM_Contact {
 		global $wpdb;
 		
 		$query = "SELECT * FROM $this->table_name WHERE 1=1";
+		$query = $this->build_where_clause( $query, $args );
+
+		// Pagination
+		$per_page = isset( $args['per_page'] ) ? absint( $args['per_page'] ) : 20;
+		$page = isset( $args['page'] ) ? absint( $args['page'] ) : 1;
+		$offset = ( $page - 1 ) * $per_page;
+
+		$query .= " ORDER BY created_at DESC LIMIT $offset, $per_page";
+
+		return $wpdb->get_results( $query );
+	}
+	
+	public function get_count( $args = array() ) {
+		global $wpdb;
+		
+		$query = "SELECT COUNT(*) FROM $this->table_name WHERE 1=1";
+		$query = $this->build_where_clause( $query, $args );
+		
+		return (int) $wpdb->get_var( $query );
+	}
+
+	private function build_where_clause( $query, $args ) {
+		global $wpdb;
 		
 		if ( ! empty( $args['search'] ) ) {
 			$search = esc_sql( $wpdb->esc_like( $args['search'] ) );
 			$query .= " AND (email LIKE '%$search%' OR first_name LIKE '%$search%' OR last_name LIKE '%$search%')";
 		}
 
-        if ( isset( $args['include_ids'] ) ) {
-            $ids = implode( ',', array_map( 'absint', $args['include_ids'] ) );
-            if ( empty( $ids ) ) $ids = '0';
-            $query .= " AND id IN ($ids)";
-        }
-
-		// Basic pagination
-		$limit = 50;
-		$offset = 0;
-		if ( ! empty( $args['page'] ) ) {
-			$offset = ( absint( $args['page'] ) - 1 ) * $limit;
+		if ( isset( $args['include_ids'] ) ) {
+			$ids = implode( ',', array_map( 'absint', $args['include_ids'] ) );
+			if ( empty( $ids ) ) $ids = '0';
+			$query .= " AND id IN ($ids)";
 		}
 
-		$query .= " ORDER BY created_at DESC LIMIT $offset, $limit";
+		if ( isset( $args['tag_id'] ) && $args['tag_id'] > 0 ) {
+			$tag_id = absint( $args['tag_id'] );
+			$contact_tags_table = $wpdb->prefix . 'gee_crm_contact_tags';
+			$query .= " AND id IN (SELECT contact_id FROM $contact_tags_table WHERE tag_id = $tag_id)";
+		}
 
-		return $wpdb->get_results( $query );
-	}
-	
-	public function get_count() {
-		global $wpdb;
-		return $wpdb->get_var( "SELECT COUNT(*) FROM $this->table_name" );
+		return $query;
 	}
 }

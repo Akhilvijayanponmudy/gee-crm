@@ -3,10 +3,12 @@
 class Gee_Woo_CRM_Ajax {
 
 	public function init() {
-		add_action( 'wp_ajax_gee_crm_sync_contacts', array( $this, 'sync_contacts' ) );
+        add_action( 'wp_ajax_gee_crm_sync_contacts', array( $this, 'sync_contacts' ) );
         add_action( 'wp_ajax_gee_crm_create_tag', array( $this, 'create_tag' ) );
+        add_action( 'wp_ajax_gee_crm_update_tag', array( $this, 'update_tag' ) );
         add_action( 'wp_ajax_gee_crm_delete_tag', array( $this, 'delete_tag' ) );
         add_action( 'wp_ajax_gee_crm_assign_tag', array( $this, 'assign_tag' ) );
+        add_action( 'wp_ajax_gee_crm_remove_tag', array( $this, 'remove_tag' ) );
 	}
 
 	public function sync_contacts() {
@@ -78,6 +80,26 @@ class Gee_Woo_CRM_Ajax {
         wp_send_json_success( array( 'message' => 'Tag created' ) );
     }
 
+    public function update_tag() {
+        check_ajax_referer( 'gee_woo_crm_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( 'Forbidden' );
+
+        $id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
+        $name = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '';
+
+        if ( ! $id || ! $name ) wp_send_json_error( 'ID and name required' );
+
+        require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-tag.php';
+        $model = new Gee_Woo_CRM_Tag();
+        $result = $model->update_tag( $id, $name );
+
+        if ( is_wp_error( $result ) ) {
+            wp_send_json_error( $result->get_error_message() );
+        }
+
+        wp_send_json_success( array( 'message' => 'Tag updated' ) );
+    }
+
     public function delete_tag() {
         check_ajax_referer( 'gee_woo_crm_nonce', 'nonce' );
         if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( 'Forbidden' );
@@ -103,8 +125,28 @@ class Gee_Woo_CRM_Ajax {
 
         require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-tag.php';
         $model = new Gee_Woo_CRM_Tag();
-        $model->assign_tag( $contact_id, $tag_id );
+        $result = $model->assign_tag( $contact_id, $tag_id );
+
+        if ( $result === false ) {
+            wp_send_json_error( 'Tag is already assigned to this contact' );
+        }
 
         wp_send_json_success( array( 'message' => 'Tag assigned' ) );
+    }
+
+    public function remove_tag() {
+        check_ajax_referer( 'gee_woo_crm_nonce', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) wp_send_json_error( 'Forbidden' );
+
+        $contact_id = isset( $_POST['contact_id'] ) ? absint( $_POST['contact_id'] ) : 0;
+        $tag_id = isset( $_POST['tag_id'] ) ? absint( $_POST['tag_id'] ) : 0;
+
+        if ( ! $contact_id || ! $tag_id ) wp_send_json_error( 'Missing Params' );
+
+        require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-tag.php';
+        $model = new Gee_Woo_CRM_Tag();
+        $model->remove_tag( $contact_id, $tag_id );
+
+        wp_send_json_success( array( 'message' => 'Tag removed' ) );
     }
 }

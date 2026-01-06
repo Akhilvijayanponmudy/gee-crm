@@ -25,11 +25,17 @@ $tags = $tag_model->get_tags();
         <tbody id="gee-tags-list">
             <?php if ( $tags ) : ?>
                 <?php foreach ( $tags as $tag ) : ?>
-                    <tr>
+                    <tr data-tag-id="<?php echo $tag->id; ?>">
                         <td><?php echo $tag->id; ?></td>
-                        <td><?php echo esc_html( $tag->name ); ?></td>
+                        <td class="tag-name-cell">
+                            <span class="tag-name-display"><?php echo esc_html( $tag->name ); ?></span>
+                            <input type="text" class="tag-name-edit" value="<?php echo esc_attr( $tag->name ); ?>" style="display:none; width:100%; padding:5px;">
+                        </td>
                         <td><?php echo esc_html( $tag->slug ); ?></td>
                         <td>
+                            <button class="gee-edit-tag-btn gee-crm-btn" data-id="<?php echo $tag->id; ?>" style="margin-right:5px;">Edit</button>
+                            <button class="gee-save-tag-btn gee-crm-btn gee-crm-btn-primary" data-id="<?php echo $tag->id; ?>" style="display:none; margin-right:5px;">Save</button>
+                            <button class="gee-cancel-edit-tag-btn gee-crm-btn" data-id="<?php echo $tag->id; ?>" style="display:none; margin-right:5px;">Cancel</button>
                             <button class="gee-delete-tag-btn gee-crm-btn" data-id="<?php echo $tag->id; ?>" style="color:red; border-color:red;">Delete</button>
                         </td>
                     </tr>
@@ -74,6 +80,62 @@ jQuery(document).ready(function($) {
                 alert(res.data);
             }
         });
+    });
+
+    // Edit tag
+    $('.gee-edit-tag-btn').on('click', function() {
+        var $row = $(this).closest('tr');
+        var id = $(this).data('id');
+        
+        $row.find('.tag-name-display').hide();
+        $row.find('.tag-name-edit').show().focus();
+        $row.find('.gee-edit-tag-btn').hide();
+        $row.find('.gee-save-tag-btn').show();
+        $row.find('.gee-cancel-edit-tag-btn').show();
+    });
+
+    // Cancel edit
+    $(document).on('click', '.gee-cancel-edit-tag-btn', function() {
+        var $row = $(this).closest('tr');
+        var originalName = $row.find('.tag-name-display').text();
+        
+        $row.find('.tag-name-edit').val(originalName).hide();
+        $row.find('.tag-name-display').show();
+        $row.find('.gee-edit-tag-btn').show();
+        $row.find('.gee-save-tag-btn').hide();
+        $row.find('.gee-cancel-edit-tag-btn').hide();
+    });
+
+    // Save tag
+    $(document).on('click', '.gee-save-tag-btn', function() {
+        var $row = $(this).closest('tr');
+        var id = $(this).data('id');
+        var name = $row.find('.tag-name-edit').val().trim();
+        
+        if(!name) {
+            alert('Tag name cannot be empty');
+            return;
+        }
+        
+        $.post(geeWooCRM.ajaxurl, {
+            action: 'gee_crm_update_tag',
+            nonce: geeWooCRM.nonce,
+            id: id,
+            name: name
+        }, function(res) {
+            if(res.success) {
+                location.reload(); 
+            } else {
+                alert(res.data);
+            }
+        });
+    });
+
+    // Allow Enter key to save
+    $(document).on('keypress', '.tag-name-edit', function(e) {
+        if(e.which === 13) { // Enter key
+            $(this).closest('tr').find('.gee-save-tag-btn').click();
+        }
     });
 });
 </script>
