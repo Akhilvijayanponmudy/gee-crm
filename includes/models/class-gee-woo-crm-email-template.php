@@ -111,7 +111,7 @@ class Gee_Woo_CRM_Email_Template {
 			'{site_name}' => get_bloginfo( 'name' ),
 			'{site_url}' => home_url(),
 			'{current_date}' => date( 'F j, Y' ),
-			'{unsubscribe_link}' => home_url( '/unsubscribe?email=john.doe@example.com' ),
+			'{unsubscribe_link}' => home_url( '/wp-json/gee-crm/v1/unsubscribe?email=john.doe@example.com&token=example_token_here' ),
 		);
 
 		// Replace variables in content
@@ -613,8 +613,32 @@ class Gee_Woo_CRM_Email_Template {
 	/**
 	 * Add unsubscribe link to email content if not present
 	 */
-	public function add_unsubscribe_link( $content, $email ) {
-		$unsubscribe_link = home_url( '/wp-json/gee-crm/v1/unsubscribe?email=' . urlencode( $email ) );
+	public function add_unsubscribe_link( $content, $email, $contact_id = 0 ) {
+		require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-contact.php';
+		$contact_model = new Gee_Woo_CRM_Contact();
+		
+		// Get or generate secure token for this contact
+		if ( $contact_id > 0 ) {
+			$token = $contact_model->get_unsubscribe_token( $contact_id );
+		} else {
+			// Fallback: find contact by email to get ID
+			global $wpdb;
+			$contact = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}gee_crm_contacts WHERE email = %s", $email ) );
+			if ( $contact ) {
+				$token = $contact_model->get_unsubscribe_token( $contact->id );
+			} else {
+				// Contact doesn't exist yet - this shouldn't happen, but handle it
+				$token = '';
+			}
+		}
+		
+		// Build secure unsubscribe link with token
+		if ( ! empty( $token ) ) {
+			$unsubscribe_link = home_url( '/wp-json/gee-crm/v1/unsubscribe?email=' . urlencode( $email ) . '&token=' . urlencode( $token ) );
+		} else {
+			// Fallback (shouldn't happen, but prevent broken links)
+			$unsubscribe_link = home_url( '/wp-json/gee-crm/v1/unsubscribe?email=' . urlencode( $email ) );
+		}
 		
 		// Check if unsubscribe link already exists
 		if ( strpos( $content, '{unsubscribe_link}' ) !== false ) {

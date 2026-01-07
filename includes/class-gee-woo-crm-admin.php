@@ -6,6 +6,9 @@ class Gee_Woo_CRM_Admin {
 		add_action( 'admin_menu', array( $this, 'add_plugin_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_filter( 'mce_buttons', array( $this, 'remove_image_buttons' ), 10, 2 );
+		add_filter( 'mce_external_plugins', array( $this, 'disable_image_plugins' ), 10, 1 );
+		add_filter( 'tiny_mce_before_init', array( $this, 'configure_tinymce_for_email' ), 10, 2 );
 	}
 
 	public function add_plugin_admin_menu() {
@@ -31,6 +34,25 @@ class Gee_Woo_CRM_Admin {
 		if ( 'toplevel_page_gee-woo-crm' !== $hook ) {
 			return;
 		}
+		
+		// Check if we're on campaigns or email-templates page (need editor)
+		$view = isset( $_GET['view'] ) ? sanitize_text_field( $_GET['view'] ) : 'dashboard';
+		$action = isset( $_GET['action'] ) ? sanitize_text_field( $_GET['action'] ) : '';
+		
+		// Enqueue WordPress editor scripts for campaigns and email-templates pages
+		if ( ( $view === 'campaigns' && ( $action === 'new' || $action === 'edit' ) ) || 
+		     ( $view === 'email-templates' && ( $action === 'edit' || $action === 'use' || empty( $action ) ) ) ) {
+			// Enable rich editing
+			add_filter( 'user_can_richedit', '__return_true' );
+			
+			// Enqueue editor scripts
+			wp_enqueue_editor();
+			wp_enqueue_media();
+			
+			// Enqueue TinyMCE scripts
+			wp_tinymce_inline_scripts();
+		}
+		
 		// Enqueue Chart.js only for dashboard if needed, or globally for the SPA feel
 		wp_enqueue_script( 'chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', array(), '4.4.0', true );
 		wp_enqueue_script( 'gee-woo-crm-admin', GEE_WOO_CRM_URL . 'assets/js/admin.js', array( 'jquery', 'chart-js' ), GEE_WOO_CRM_VERSION, true );
@@ -132,5 +154,61 @@ class Gee_Woo_CRM_Admin {
 		} else {
 			echo '<p>View not found.</p>';
 		}
+	}
+
+	/**
+	 * Remove image/media buttons from TinyMCE toolbar
+	 */
+	public function remove_image_buttons( $buttons, $editor_id ) {
+		// Only apply to our email editors
+		if ( strpos( $editor_id, 'content-visual' ) !== false ) {
+			// Remove image button if present
+			$buttons = array_diff( $buttons, array( 'image', 'wp_img_edit' ) );
+		}
+		return $buttons;
+	}
+
+	/**
+	 * Disable image-related plugins
+	 */
+	public function disable_image_plugins( $plugins ) {
+		// Remove image-related plugins
+		unset( $plugins['image'] );
+		unset( $plugins['wp_img_edit'] );
+		return $plugins;
+	}
+
+	/**
+	 * Configure TinyMCE specifically for email editing
+	 */
+	public function configure_tinymce_for_email( $init, $editor_id ) {
+		// Only apply to our email editors
+		if ( strpos( $editor_id, 'content-visual' ) !== false ) {
+			// Completely disable image insertion
+			$init['invalid_elements'] = 'img,iframe,object,embed';
+			$init['extended_valid_elements'] = '';
+			
+			// Remove image from context menu
+			$init['contextmenu'] = 'link | copy cut paste';
+			
+			// Disable drag and drop and image pasting
+			$init['paste_data_images'] = false;
+			$init['paste_as_text'] = false;
+			$init['paste_remove_spans'] = false;
+			$init['paste_remove_styles'] = false;
+			
+			// Ensure media buttons are disabled
+			$init['media_buttons'] = false;
+			
+			// Block image insertion via various methods
+			$init['file_picker_types'] = '';
+			$init['file_picker_callback'] = '';
+			
+			// Remove image button from toolbar if somehow added
+			if ( isset( $init['toolbar1'] ) ) {
+				$init['toolbar1'] = str_replace( array( 'image', 'wp_img_edit', ',' ), array( '', '', '' ), $init['toolbar1'] );
+			}
+		}
+		return $init;
 	}
 }

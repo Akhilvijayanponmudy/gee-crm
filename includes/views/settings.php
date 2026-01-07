@@ -134,32 +134,39 @@ $api_endpoint = home_url( '/wp-json/gee-crm/v1/subscribe' );
 <div class="gee-crm-card">
 	<h2>Settings</h2>
 	
+	<!-- Settings Tabs -->
+	<div style="border-bottom:2px solid #e5e5e5; margin-bottom:20px;">
+		<button type="button" class="gee-settings-tab active" data-tab="consent-form" style="padding:12px 24px; background:none; border:none; border-bottom:3px solid #2271b1; color:#2271b1; font-weight:600; cursor:pointer; font-size:14px;">Consent Form Integration</button>
+		<button type="button" class="gee-settings-tab" data-tab="privacy" style="padding:12px 24px; background:none; border:none; border-bottom:3px solid transparent; color:#666; font-weight:600; cursor:pointer; font-size:14px;">Privacy & Legal</button>
+		<button type="button" class="gee-settings-tab" data-tab="sync" style="padding:12px 24px; background:none; border:none; border-bottom:3px solid transparent; color:#666; font-weight:600; cursor:pointer; font-size:14px;">Data Sync</button>
+	</div>
+	
 	<form method="post" id="gee-settings-form">
 		<?php wp_nonce_field( 'gee_save_settings_nonce' ); ?>
 		
-		<!-- GDPR Compliance Section -->
-		<div style="background:#e8f4f8; padding:20px; border-radius:4px; margin-bottom:30px; border-left:4px solid #4e28a5;">
-			<h3 style="margin-top:0; color:#4e28a5;">GDPR Compliance</h3>
-			<p style="color:#666;">
-				This plugin is designed to be GDPR compliant. Marketing emails are only sent to contacts who have explicitly consented.
-				All consent is tracked with timestamps, and contacts can unsubscribe at any time.
-			</p>
-			<p>
-				<label>
-					<input type="checkbox" name="gdpr_compliance_mode" value="1" <?php checked( $settings['gdpr_compliance_mode'], 1 ); ?>>
-					<strong>Enable GDPR Compliance Mode</strong>
-				</label>
-				<br>
-				<small style="color:#666;">When enabled, only contacts with explicit marketing consent will receive campaigns.</small>
-			</p>
-		</div>
+		<!-- Consent Form Integration Tab -->
+		<div id="tab-consent-form" class="gee-settings-tab-content">
+			<div style="background:#e8f4f8; padding:20px; border-left:4px solid #2271b1; border-radius:4px; margin-bottom:25px;">
+				<h3 style="margin-top:0; color:#2271b1;">📋 Marketing Consent Form Integration</h3>
+				<p style="margin:10px 0; line-height:1.6; color:#333;">
+					<strong>What is this?</strong> The Marketing Consent Form Integration allows you to capture user consent for marketing emails directly from your website forms. 
+					When users check the consent checkbox and submit any form on your site, their marketing consent status is automatically updated in your CRM.
+				</p>
+				<p style="margin:10px 0; line-height:1.6; color:#333;">
+					<strong>How it works:</strong> Add the provided code snippet to your contact forms (Contact Form 7, Gravity Forms, custom forms, etc.). 
+					The code includes a consent checkbox and JavaScript that automatically sends the user's email and consent status to the CRM via a secure REST API endpoint.
+				</p>
+				<p style="margin:10px 0; line-height:1.6; color:#333;">
+					<strong>Priority & Importance:</strong> This integration is <strong style="color:#d63638;">critical for GDPR compliance</strong> and ensures you only send marketing emails to users who have explicitly consented. 
+					Contacts without marketing consent will be marked as "Unsubscribed" and will NOT receive campaign emails, protecting you from compliance issues and improving email deliverability.
+				</p>
+			</div>
 		
 		<!-- Form Integration Section -->
 		<div style="background:#f8f9fa; padding:20px; border-radius:4px; margin-bottom:30px;">
-			<h3 style="margin-top:0;">Form Integration - Marketing Consent</h3>
+			<h3 style="margin-top:0;">Integration Methods</h3>
 			<p style="color:#666; margin-bottom:20px;">
-				Add this code snippet to your contact forms to capture marketing consent. When users check the consent checkbox and submit the form, 
-				their marketing consent will be automatically updated in the CRM.
+				Choose the integration method that best fits your form setup. The HTML snippet works with most forms automatically, while the JavaScript method gives you more control for custom implementations.
 			</p>
 			
 			<div style="background:#fff; padding:15px; border:1px solid #ddd; border-radius:4px; margin-bottom:15px;">
@@ -174,50 +181,93 @@ $api_endpoint = home_url( '/wp-json/gee-crm/v1/subscribe' );
 				<button type="button" class="button" onclick="copyToClipboard(document.getElementById('form-snippet-js'));" style="margin-top:10px;">Copy Code</button>
 			</div>
 			
-			<div style="background:#fff3cd; padding:15px; border-left:4px solid #ffc107; border-radius:4px;">
-				<p style="margin:0; color:#856404;">
+			<div style="background:#fff3cd; padding:15px; border-left:4px solid #ffc107; border-radius:4px; margin-bottom:20px;">
+				<p style="margin:0 0 10px 0; color:#856404;">
 					<strong>API Endpoint:</strong> <code><?php echo esc_html( $api_endpoint ); ?></code><br>
 					<strong>API Key:</strong> <code><?php echo esc_html( $api_key ); ?></code>
 					<a href="<?php echo wp_nonce_url( '?page=gee-woo-crm&view=settings&action=regenerate_api_key', 'regenerate_api_key' ); ?>" class="button button-small" style="margin-left:10px;" onclick="return confirm('Regenerate API key? Existing forms will need to be updated.');">Regenerate</a>
 				</p>
 			</div>
-		</div>
-		
-		
-		<!-- Data Synchronization Section -->
-		<div style="background:#f8f9fa; padding:20px; border-radius:4px; margin-bottom:30px;">
-			<h3 style="margin-top:0;">Data Synchronization</h3>
-			<p style="color:#666; margin-bottom:20px;">
-				Import customers from WooCommerce (Registered Users + Guest Orders).
-			</p>
-			<button id="gee-crm-sync-btn" class="gee-crm-btn gee-crm-btn-primary">Sync WooCommerce Customers</button>
-			<p id="gee-crm-sync-status" style="margin-top: 10px; color: #666;"></p>
-		</div>
-		
-		<!-- Privacy & Legal Section -->
-		<div style="background:#f8f9fa; padding:20px; border-radius:4px; margin-bottom:30px;">
-			<h3 style="margin-top:0;">Privacy & Legal</h3>
 			
-			<div style="margin-bottom:15px;">
-				<label><strong>Privacy Policy URL:</strong></label><br>
-				<input type="url" name="privacy_policy_url" value="<?php echo esc_url( $settings['privacy_policy_url'] ); ?>" style="width:100%; max-width:600px; padding:8px; margin-top:5px;" placeholder="https://yoursite.com/privacy-policy">
-				<br>
-				<small style="color:#666;">Link to your privacy policy page. This will be included in form snippets.</small>
+			<div style="background:#d1ecf1; padding:20px; border-left:4px solid #0c5460; border-radius:4px; margin-top:20px;">
+				<h4 style="margin-top:0; color:#0c5460;">🔒 Security & API Authentication</h4>
+				<p style="margin:10px 0; line-height:1.6; color:#0c5460;">
+					All form submissions are secured using an API key that must be included in the request headers. 
+					This prevents unauthorized access and ensures only your forms can update consent status. 
+					Keep your API key secure and regenerate it if you suspect it has been compromised.
+				</p>
 			</div>
 			
-			<div style="margin-bottom:15px;">
-				<label><strong>Unsubscribe Page URL:</strong></label><br>
-				<input type="url" name="unsubscribe_page_url" value="<?php echo esc_url( $settings['unsubscribe_page_url'] ); ?>" style="width:100%; max-width:600px; padding:8px; margin-top:5px;" placeholder="https://yoursite.com/unsubscribe">
-				<br>
-				<small style="color:#666;">Page where users can unsubscribe from marketing emails.</small>
+			<div style="background:#f0f6fc; padding:20px; border-left:4px solid #2271b1; border-radius:4px; margin-top:20px;">
+				<h4 style="margin-top:0; color:#2271b1;">⚡ Integration Priority & Best Practices</h4>
+				<ul style="margin:10px 0; padding-left:20px; line-height:1.8; color:#333;">
+					<li><strong>High Priority:</strong> Add consent forms to all lead capture forms (contact forms, newsletter signups, checkout pages)</li>
+					<li><strong>GDPR Compliance:</strong> Only send marketing emails to contacts with explicit consent (marketing_consent = true)</li>
+					<li><strong>Campaign Filtering:</strong> Campaigns automatically exclude unsubscribed contacts (marketing_consent = false)</li>
+					<li><strong>Data Accuracy:</strong> Consent status is updated in real-time when forms are submitted</li>
+					<li><strong>Thank You Emails:</strong> Contacts who grant consent may receive a welcome/thank you email automatically</li>
+				</ul>
+			</div>
+		</div>
+		</div>
+		
+		<!-- Privacy & Legal Tab -->
+		<div id="tab-privacy" class="gee-settings-tab-content" style="display:none;">
+			<div style="background:#f8f9fa; padding:20px; border-radius:4px; margin-bottom:30px;">
+				<h3 style="margin-top:0;">Privacy & Legal Settings</h3>
+				<p style="color:#666; margin-bottom:20px;">
+					Configure privacy policy and unsubscribe links that will be included in your email campaigns and form integrations.
+				</p>
+				
+				<div style="margin-bottom:15px;">
+					<label><strong>Privacy Policy URL:</strong></label><br>
+					<input type="url" name="privacy_policy_url" value="<?php echo esc_url( $settings['privacy_policy_url'] ); ?>" style="width:100%; max-width:600px; padding:8px; margin-top:5px;" placeholder="https://yoursite.com/privacy-policy">
+					<br>
+					<small style="color:#666;">Link to your privacy policy page. This will be included in form snippets and helps with GDPR compliance.</small>
+				</div>
+				
+				<div style="margin-bottom:15px;">
+					<label><strong>Unsubscribe Page URL:</strong></label><br>
+					<input type="url" name="unsubscribe_page_url" value="<?php echo esc_url( $settings['unsubscribe_page_url'] ); ?>" style="width:100%; max-width:600px; padding:8px; margin-top:5px;" placeholder="https://yoursite.com/unsubscribe">
+					<br>
+					<small style="color:#666;">Page where users can unsubscribe from marketing emails. You can use the endpoint: <code><?php echo home_url( '/wp-json/gee-crm/v1/unsubscribe?email={email}' ); ?></code></small>
+				</div>
 			</div>
 		</div>
 		
-		<div style="margin-top:30px;">
+		<!-- Data Synchronization Tab -->
+		<div id="tab-sync" class="gee-settings-tab-content" style="display:none;">
+			<div style="background:#f8f9fa; padding:20px; border-radius:4px; margin-bottom:30px;">
+				<h3 style="margin-top:0;">Data Synchronization</h3>
+				<p style="color:#666; margin-bottom:20px;">
+					Import customers from WooCommerce (Registered Users + Guest Orders). This will create contacts in your CRM for all WooCommerce customers.
+				</p>
+				<button id="gee-crm-sync-btn" class="gee-crm-btn gee-crm-btn-primary">Sync WooCommerce Customers</button>
+				<p id="gee-crm-sync-status" style="margin-top: 10px; color: #666;"></p>
+			</div>
+		</div>
+		
+		<div style="margin-top:30px; border-top:1px solid #e5e5e5; padding-top:20px;">
 			<input type="submit" name="gee_save_settings" class="gee-crm-btn gee-crm-btn-primary" value="Save Settings">
 		</div>
 	</form>
 </div>
+
+<style>
+.gee-settings-tab {
+	transition: all 0.2s ease;
+}
+.gee-settings-tab:hover {
+	color: #2271b1 !important;
+}
+.gee-settings-tab-content {
+	animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+</style>
 
 <script>
 function copyToClipboard(element) {
@@ -226,4 +276,24 @@ function copyToClipboard(element) {
 	alert('Code copied to clipboard!');
 }
 
+// Tab switching functionality
+jQuery(document).ready(function($) {
+	$('.gee-settings-tab').on('click', function() {
+		var tab = $(this).data('tab');
+		
+		// Update tab buttons
+		$('.gee-settings-tab').removeClass('active').css({
+			'border-bottom-color': 'transparent',
+			'color': '#666'
+		});
+		$(this).addClass('active').css({
+			'border-bottom-color': '#2271b1',
+			'color': '#2271b1'
+		});
+		
+		// Show/hide tab content
+		$('.gee-settings-tab-content').hide();
+		$('#tab-' + tab).show();
+	});
+});
 </script>

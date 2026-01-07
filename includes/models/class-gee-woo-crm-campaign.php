@@ -282,6 +282,24 @@ class Gee_Woo_CRM_Campaign {
     }
 
     /**
+     * Get secure unsubscribe link with token
+     */
+    private function get_secure_unsubscribe_link( $contact ) {
+        require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-contact.php';
+        $contact_model = new Gee_Woo_CRM_Contact();
+        
+        // Get secure token for this contact
+        $token = $contact_model->get_unsubscribe_token( $contact->id );
+        
+        if ( ! empty( $token ) ) {
+            return home_url( '/wp-json/gee-crm/v1/unsubscribe?email=' . urlencode( $contact->email ) . '&token=' . urlencode( $token ) );
+        }
+        
+        // Fallback (shouldn't happen)
+        return home_url( '/wp-json/gee-crm/v1/unsubscribe?email=' . urlencode( $contact->email ) );
+    }
+    
+    /**
      * Replace variables in email content with contact data
      */
     private function replace_variables( $content, $contact ) {
@@ -331,7 +349,7 @@ class Gee_Woo_CRM_Campaign {
             '{site_name}' => get_bloginfo( 'name' ),
             '{site_url}' => home_url(),
             '{current_date}' => date( 'F j, Y' ),
-            '{unsubscribe_link}' => home_url( '/wp-json/gee-crm/v1/unsubscribe?email=' . urlencode( $contact->email ) ),
+            '{unsubscribe_link}' => $this->get_secure_unsubscribe_link( $contact ),
         );
         
         return str_replace( array_keys( $replacements ), array_values( $replacements ), $content );

@@ -41,7 +41,11 @@ if ( 'view' === $action && $contact_id ) {
 		<div class="gee-crm-card">
 			<div style="display:flex; justify-content:space-between; align-items:center;">
 				<h2><?php echo esc_html( $contact->first_name . ' ' . $contact->last_name ); ?></h2>
-				<span class="gee-crm-badge"><?php echo esc_html( ucfirst( $contact->status ) ); ?></span>
+				<?php if ( ! empty( $contact->marketing_consent ) ) : ?>
+					<span class="gee-crm-badge" style="background:#28a745; color:#fff;">Subscribed</span>
+				<?php else : ?>
+					<span class="gee-crm-badge" style="background:#dc3545; color:#fff;">Unsubscribed</span>
+				<?php endif; ?>
 			</div>
 			<p><strong>Email:</strong> <?php echo esc_html( $contact->email ); ?></p>
 			<p><strong>Phone:</strong> <?php echo esc_html( $contact->phone ); ?></p>
@@ -345,7 +349,13 @@ if ( 'view' === $action && $contact_id ) {
                                 </a>
                             </td>
 							<td><?php echo esc_html( $contact->email ); ?></td>
-							<td><?php echo esc_html( ucfirst( $contact->status ) ); ?></td>
+							<td>
+								<?php if ( ! empty( $contact->marketing_consent ) ) : ?>
+									<span style="color:#28a745; font-weight:600;">✓ Subscribed</span>
+								<?php else : ?>
+									<span style="color:#dc3545; font-weight:600;">✗ Unsubscribed</span>
+								<?php endif; ?>
+							</td>
 						<td>
 							<?php if ( ! empty( $contact->marketing_consent ) ) : ?>
 								<span style="color:#28a745; font-weight:600;">✓ Yes</span>

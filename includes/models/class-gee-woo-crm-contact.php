@@ -36,12 +36,102 @@ class Gee_Woo_CRM_Contact {
 		if ( ! in_array( 'consent_date', $columns ) ) {
 			$wpdb->query( "ALTER TABLE $this->table_name ADD COLUMN consent_date datetime NULL AFTER marketing_consent" );
 		}
+		
+		// Check if unsubscribe_token column exists
+		if ( ! in_array( 'unsubscribe_token', $columns ) ) {
+			$wpdb->query( "ALTER TABLE $this->table_name ADD COLUMN unsubscribe_token varchar(64) NULL AFTER consent_date" );
+			// Generate tokens for existing contacts
+			$this->generate_tokens_for_existing_contacts();
+		}
+	}
+	
+	/**
+	 * Generate secure unsubscribe token
+	 */
+	private function generate_unsubscribe_token( $email, $contact_id = 0 ) {
+		// Create a unique, secure token using email, contact ID, and a secret salt
+		$secret = defined( 'AUTH_SALT' ) ? AUTH_SALT : 'gee-crm-secret-salt-' . get_option( 'siteurl' );
+		$data = $email . '|' . $contact_id . '|' . $secret;
+		return hash( 'sha256', $data );
+	}
+	
+	/**
+	 * Generate tokens for existing contacts that don't have one
+	 */
+	private function generate_tokens_for_existing_contacts() {
+		global $wpdb;
+		$contacts = $wpdb->get_results( "SELECT id, email FROM $this->table_name WHERE unsubscribe_token IS NULL OR unsubscribe_token = ''" );
+		foreach ( $contacts as $contact ) {
+			$token = $this->generate_unsubscribe_token( $contact->email, $contact->id );
+			$wpdb->update(
+				$this->table_name,
+				array( 'unsubscribe_token' => $token ),
+				array( 'id' => $contact->id ),
+				array( '%s' ),
+				array( '%d' )
+			);
+		}
+	}
+	
+	/**
+	 * Get or generate unsubscribe token for a contact
+	 */
+	public function get_unsubscribe_token( $contact_id ) {
+		global $wpdb;
+		$contact = $wpdb->get_row( $wpdb->prepare( "SELECT id, email, unsubscribe_token FROM $this->table_name WHERE id = %d", $contact_id ) );
+		
+		if ( ! $contact ) {
+			return false;
+		}
+		
+		// Generate token if it doesn't exist
+		if ( empty( $contact->unsubscribe_token ) ) {
+			$token = $this->generate_unsubscribe_token( $contact->email, $contact->id );
+			$wpdb->update(
+				$this->table_name,
+				array( 'unsubscribe_token' => $token ),
+				array( 'id' => $contact_id ),
+				array( '%s' ),
+				array( '%d' )
+			);
+			return $token;
+		}
+		
+		return $contact->unsubscribe_token;
+	}
+	
+	/**
+	 * Verify unsubscribe token
+	 */
+	public function verify_unsubscribe_token( $email, $token ) {
+		global $wpdb;
+		$contact = $wpdb->get_row( $wpdb->prepare( "SELECT id, email, unsubscribe_token FROM $this->table_name WHERE email = %s", $email ) );
+		
+		if ( ! $contact ) {
+			return false;
+		}
+		
+		// If no token exists, generate one (shouldn't happen, but handle it)
+		if ( empty( $contact->unsubscribe_token ) ) {
+			$new_token = $this->generate_unsubscribe_token( $contact->email, $contact->id );
+			$wpdb->update(
+				$this->table_name,
+				array( 'unsubscribe_token' => $new_token ),
+				array( 'id' => $contact->id ),
+				array( '%s' ),
+				array( '%d' )
+			);
+			return hash_equals( $new_token, $token );
+		}
+		
+		// Use hash_equals for timing-safe comparison
+		return hash_equals( $contact->unsubscribe_token, $token );
 	}
 
 	public function create_or_update( $data ) {
 		global $wpdb;
 		
-		$exists = $wpdb->get_row( $wpdb->prepare( "SELECT id, wp_user_id FROM $this->table_name WHERE email = %s", $data['email'] ) );
+		$exists = $wpdb->get_row( $wpdb->prepare( "SELECT id, wp_user_id, unsubscribe_token FROM $this->table_name WHERE email = %s", $data['email'] ) );
 
 		if ( $exists ) {
 			$update_data = array();
@@ -108,6 +198,18 @@ class Gee_Woo_CRM_Contact {
 					array( '%d' )
 				);
 			}
+			// Ensure token exists for existing contact
+			if ( empty( $exists->unsubscribe_token ) ) {
+				$token = $this->generate_unsubscribe_token( $data['email'], $exists->id );
+				$wpdb->update(
+					$this->table_name,
+					array( 'unsubscribe_token' => $token ),
+					array( 'id' => $exists->id ),
+					array( '%s' ),
+					array( '%d' )
+				);
+			}
+			
 			return $exists->id;
 		} else {
 			$marketing_consent = isset( $data['marketing_consent'] ) && $data['marketing_consent'] ? 1 : 0;
@@ -154,7 +256,19 @@ class Gee_Woo_CRM_Contact {
 				return false;
 			}
 			
-			return $wpdb->insert_id;
+			$contact_id = $wpdb->insert_id;
+			
+			// Generate unsubscribe token for new contact
+			$token = $this->generate_unsubscribe_token( $data['email'], $contact_id );
+			$wpdb->update(
+				$this->table_name,
+				array( 'unsubscribe_token' => $token ),
+				array( 'id' => $contact_id ),
+				array( '%s' ),
+				array( '%d' )
+			);
+			
+			return $contact_id;
 		}
 	}
 	

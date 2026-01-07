@@ -20,6 +20,7 @@ class Gee_Woo_CRM_Activator {
 			status varchar(20) DEFAULT 'subscribed',
 			marketing_consent tinyint(1) DEFAULT 0,
 			consent_date datetime NULL,
+			unsubscribe_token varchar(64) NULL,
 			source varchar(50) DEFAULT 'manual',
 			created_at datetime DEFAULT CURRENT_TIMESTAMP,
 			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

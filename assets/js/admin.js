@@ -1,4 +1,48 @@
 jQuery(document).ready(function ($) {
+    // === Editor Toggle Logic (for templates) ===
+    var $visualSection = $('.gee-crm-editor-section.visual');
+    var $htmlSection = $('.gee-crm-editor-section.html');
+    var $visualTab = $('#gee-crm-visual-tab');
+    var $htmlTab = $('#gee-crm-html-tab');
+    var $hiddenField = $('#template-content-hidden'); // For form submission
+
+    // Show the visual editor by default
+    function setEditorMode(mode) {
+        if (mode === 'visual') {
+            $visualSection.show();
+            $htmlSection.hide();
+            $visualTab.addClass('active');
+            $htmlTab.removeClass('active');
+        } else {
+            $visualSection.hide();
+            $htmlSection.show();
+            $visualTab.removeClass('active');
+            $htmlTab.addClass('active');
+        }
+    }
+    setEditorMode('visual');
+
+    $visualTab.on('click', function () {
+        setEditorMode('visual');
+    });
+    $htmlTab.on('click', function () {
+        setEditorMode('html');
+    });
+
+    // On form submit, copy the content from the active editor to the hidden field
+    $('#gee-template-form').on('submit', function () {
+        if ($visualSection.is(':visible')) {
+            // Visual (TinyMCE) mode
+            if (typeof tinymce !== 'undefined' && tinymce.get('template-content-visual')) {
+                $hiddenField.val(tinymce.get('template-content-visual').getContent());
+            }
+        } else {
+            // HTML textarea mode
+            $hiddenField.val($('#template-content').val());
+        }
+    });
+
+    // ---- Existing code below -----
 
     // Sync Contacts
     $('#gee-crm-sync-btn').on('click', function (e) {
@@ -37,10 +81,8 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         var $dropdown = $(this).parent();
         var $menu = $dropdown.find('.gee-woo-crm-dropdown-menu');
-        
         // Close other dropdowns
         $('.gee-woo-crm-dropdown-menu').not($menu).hide();
-        
         // Toggle current dropdown
         $menu.toggle();
     });

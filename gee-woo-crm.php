@@ -207,19 +207,23 @@ function gee_woo_crm_handle_unsubscribe( $request ) {
 	
 	// Support both GET and POST, and both JSON and form-encoded data
 	$email = '';
+	$token = '';
 	$format = $request->get_param( 'format' ); // Allow ?format=html for browser visits
 	
 	if ( $request->get_method() === 'GET' ) {
 		$email = isset( $_GET['email'] ) ? sanitize_email( $_GET['email'] ) : '';
+		$token = isset( $_GET['token'] ) ? sanitize_text_field( $_GET['token'] ) : '';
 	} else {
 		// Support both JSON and form-encoded POST data
 		$json_params = $request->get_json_params();
 		$form_params = $request->get_body_params();
 		$params = ! empty( $json_params ) ? $json_params : $form_params;
 		$email = isset( $params['email'] ) ? sanitize_email( $params['email'] ) : '';
+		$token = isset( $params['token'] ) ? sanitize_text_field( $params['token'] ) : '';
 	}
 	
-	if ( empty( $email ) ) {
+	// SECURITY: Require both email and token
+	if ( empty( $email ) || empty( $token ) ) {
 		// Return JSON error even for GET requests if email is missing
 		if ( $format !== 'html' ) {
 			return new WP_Error( 'missing_email', 'Email is required', array( 'status' => 400 ) );
@@ -240,8 +244,8 @@ function gee_woo_crm_handle_unsubscribe( $request ) {
 </head>
 <body>
 	<div class="container">
-		<h1>Error</h1>
-		<p>Email address is required to unsubscribe.</p>
+		<h1>Invalid Unsubscribe Link</h1>
+		<p>This unsubscribe link is invalid or has expired. Please use the unsubscribe link from your most recent email.</p>
 		<p><a href="' . esc_url( home_url() ) . '">Return to Homepage</a></p>
 	</div>
 </body>
@@ -250,12 +254,47 @@ function gee_woo_crm_handle_unsubscribe( $request ) {
 		exit;
 	}
 	
+	// SECURITY: Verify token before unsubscribing
+	$contact_model = new Gee_Woo_CRM_Contact();
+	
+	if ( ! $contact_model->verify_unsubscribe_token( $email, $token ) ) {
+		// Invalid token - security check failed
+		if ( $format === 'html' ) {
+			$html = '<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Unsubscribe Error</title>
+	<style>
+		body { font-family: Arial, sans-serif; text-align: center; padding: 50px 20px; background: #f5f5f5; }
+		.container { max-width: 600px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+		h1 { color: #d32f2f; }
+		p { color: #666; line-height: 1.6; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>Invalid Unsubscribe Link</h1>
+		<p>This unsubscribe link is invalid or has been tampered with. For security reasons, only the actual email owner can unsubscribe.</p>
+		<p>Please use the unsubscribe link from your most recent email, or contact support if you need assistance.</p>
+		<p><a href="' . esc_url( home_url() ) . '">Return to Homepage</a></p>
+	</div>
+</body>
+</html>';
+			echo $html;
+			exit;
+		}
+		
+		return new WP_Error( 'invalid_token', 'Invalid or missing unsubscribe token. Only the email owner can unsubscribe.', array( 'status' => 403 ) );
+	}
+	
+	// Token is valid - proceed with unsubscribe
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'gee_crm_contacts';
 	$contact = $wpdb->get_row( $wpdb->prepare( "SELECT id FROM $table_name WHERE email = %s", $email ) );
 	
 	if ( $contact ) {
-		$contact_model = new Gee_Woo_CRM_Contact();
 		$contact_model->update_marketing_consent( $contact->id, false );
 		
 		// Return HTML page only if format=html is explicitly requested (for direct browser visits)
@@ -396,6 +435,7 @@ function gee_woo_crm_send_thank_you_email( $contact_id, $email, $first_name, $la
 	$contact = $contact_model->get_contact( $contact_id );
 	if ( ! $contact ) {
 		$contact = (object) array(
+			'id' => $contact_id,
 			'email' => $email,
 			'first_name' => $first_name,
 			'last_name' => $last_name,
@@ -413,8 +453,8 @@ function gee_woo_crm_send_thank_you_email( $contact_id, $email, $first_name, $la
 	$subject = $method->invoke( $campaign_model, $subject, $contact );
 	$content = $method->invoke( $campaign_model, $content, $contact );
 	
-	// Ensure unsubscribe link is added
-	$content = $template_model->add_unsubscribe_link( $content, $email );
+	// Ensure unsubscribe link is added with secure token
+	$content = $template_model->add_unsubscribe_link( $content, $email, isset( $contact->id ) ? $contact->id : $contact_id );
 	
 	$headers = array( 'Content-Type: text/html; charset=UTF-8' );
 	wp_mail( $email, $subject, $content, $headers );
