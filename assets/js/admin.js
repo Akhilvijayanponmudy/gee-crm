@@ -76,7 +76,36 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    // Dropdown Menu Toggle
+    // Dropdown Menu - Enhanced hover handling to prevent closing when moving to menu
+    var dropdownTimeout;
+    $('.gee-woo-crm-nav-dropdown').on('mouseenter', function() {
+        clearTimeout(dropdownTimeout);
+        var $menu = $(this).find('.gee-woo-crm-dropdown-menu');
+        $menu.show();
+    }).on('mouseleave', function() {
+        var $menu = $(this).find('.gee-woo-crm-dropdown-menu');
+        var $self = $(this);
+        // Small delay to allow mouse to move to dropdown menu
+        dropdownTimeout = setTimeout(function() {
+            // Check if mouse is still over dropdown or its parent
+            if (!$self.is(':hover') && !$menu.is(':hover')) {
+                $menu.hide();
+            }
+        }, 200);
+    });
+
+    // Keep dropdown open when hovering over menu itself
+    $('.gee-woo-crm-dropdown-menu').on('mouseenter', function() {
+        clearTimeout(dropdownTimeout);
+        $(this).show();
+    }).on('mouseleave', function() {
+        var $self = $(this);
+        dropdownTimeout = setTimeout(function() {
+            $self.hide();
+        }, 200);
+    });
+
+    // Click toggle for accessibility
     $('.gee-woo-crm-nav-dropdown > .gee-woo-crm-nav-item').on('click', function(e) {
         e.preventDefault();
         var $dropdown = $(this).parent();
@@ -93,5 +122,20 @@ jQuery(document).ready(function ($) {
             $('.gee-woo-crm-dropdown-menu').hide();
         }
     });
+
+    // Development Banner Dismiss
+    $('.gee-crm-dev-banner-dismiss').on('click', function() {
+        var $banner = $(this).closest('.gee-crm-dev-banner');
+        $banner.fadeOut(300, function() {
+            $banner.addClass('hidden');
+            // Save dismissal state in localStorage
+            localStorage.setItem('gee_crm_dev_banner_dismissed', 'true');
+        });
+    });
+
+    // Check if banner was previously dismissed
+    if (localStorage.getItem('gee_crm_dev_banner_dismissed') === 'true') {
+        $('.gee-crm-dev-banner').addClass('hidden');
+    }
 
 });

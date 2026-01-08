@@ -608,6 +608,76 @@ class Gee_Woo_CRM_Email_Template {
 				)
 			);
 		}
+		
+		// Create 4 additional product-focused templates
+		$this->ensure_product_templates();
+	}
+	
+	/**
+	 * Ensure 4 product-focused email templates exist
+	 */
+	private function ensure_product_templates() {
+		global $wpdb;
+		
+		// Template 1: Product Launch
+		$launch_exists = $wpdb->get_var( "SELECT id FROM $this->table_name WHERE name = 'Product Launch Template'" );
+		if ( ! $launch_exists ) {
+			$wpdb->insert(
+				$this->table_name,
+				array(
+					'name' => 'Product Launch Template',
+					'subject' => '🎉 Introducing Our New Product - {first_name}!',
+					'content_html' => $this->get_product_launch_template(),
+					'description' => 'Perfect for announcing new product launches with excitement and clear call-to-action',
+					'is_default' => 0
+				)
+			);
+		}
+		
+		// Template 2: Flash Sale
+		$sale_exists = $wpdb->get_var( "SELECT id FROM $this->table_name WHERE name = 'Flash Sale Template'" );
+		if ( ! $sale_exists ) {
+			$wpdb->insert(
+				$this->table_name,
+				array(
+					'name' => 'Flash Sale Template',
+					'subject' => '⚡ Flash Sale Alert - {first_name}! Limited Time Only',
+					'content_html' => $this->get_flash_sale_template(),
+					'description' => 'Urgent flash sale template with countdown feel and strong discount messaging',
+					'is_default' => 0
+				)
+			);
+		}
+		
+		// Template 3: Product Recommendation
+		$recommend_exists = $wpdb->get_var( "SELECT id FROM $this->table_name WHERE name = 'Product Recommendation Template'" );
+		if ( ! $recommend_exists ) {
+			$wpdb->insert(
+				$this->table_name,
+				array(
+					'name' => 'Product Recommendation Template',
+					'subject' => 'Recommended for You, {first_name}!',
+					'content_html' => $this->get_product_recommendation_template(),
+					'description' => 'Personalized product recommendations based on customer preferences and purchase history',
+					'is_default' => 0
+				)
+			);
+		}
+		
+		// Template 4: Abandoned Cart Follow-up
+		$cart_exists = $wpdb->get_var( "SELECT id FROM $this->table_name WHERE name = 'Abandoned Cart Template'" );
+		if ( ! $cart_exists ) {
+			$wpdb->insert(
+				$this->table_name,
+				array(
+					'name' => 'Abandoned Cart Template',
+					'subject' => 'You left something in your cart, {first_name}!',
+					'content_html' => $this->get_abandoned_cart_template(),
+					'description' => 'Recover abandoned carts with friendly reminder and incentive to complete purchase',
+					'is_default' => 0
+				)
+			);
+		}
 	}
 	
 	/**
@@ -851,6 +921,335 @@ class Gee_Woo_CRM_Email_Template {
 							<p style="margin: 20px 0 0 0; color: #95a5a6; font-size: 12px;">
 								© ' . date('Y') . ' {site_name}. All rights reserved.
 							</p>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>';
+	}
+	
+	/**
+	 * Product Launch Template - For announcing new products
+	 */
+	private function get_product_launch_template() {
+		return '<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>New Product Launch</title>
+</head>
+<body style="margin:0; padding:0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif; background-color: #f5f5f5;">
+	<table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px 0;">
+		<tr>
+			<td align="center">
+				<table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 600px;">
+					<!-- Header -->
+					<tr>
+						<td style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 50px 30px; text-align: center;">
+							<h1 style="margin: 0 0 10px 0; color: #ffffff; font-size: 36px; font-weight: 700;">🚀 NEW PRODUCT LAUNCH</h1>
+							<p style="margin: 0; color: #ffffff; font-size: 20px; opacity: 0.95;">Be the first to experience it, {first_name}!</p>
+						</td>
+					</tr>
+					<!-- Hero Section -->
+					<tr>
+						<td style="padding: 40px 30px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+							<h2 style="margin: 0 0 15px 0; color: #ffffff; font-size: 32px; font-weight: 700;">Introducing Our Latest Innovation</h2>
+							<p style="margin: 0; color: #ffffff; font-size: 18px; opacity: 0.95;">Designed with you in mind</p>
+						</td>
+					</tr>
+					<!-- Main Content -->
+					<tr>
+						<td style="padding: 50px 40px;">
+							<h2 style="margin: 0 0 20px 0; color: #333333; font-size: 28px; font-weight: 600;">Hi {full_name},</h2>
+							<p style="margin: 0 0 20px 0; color: #555555; font-size: 16px; line-height: 1.8;">
+								We\'re incredibly excited to introduce our newest product! After months of development and testing, we\'re finally ready to share it with you.
+							</p>
+							<p style="margin: 0 0 30px 0; color: #555555; font-size: 16px; line-height: 1.8;">
+								As one of our valued customers, you get exclusive early access before we launch it to the public.
+							</p>
+							<!-- Features List -->
+							<div style="background: #f8f9fa; padding: 25px; border-radius: 8px; margin: 30px 0;">
+								<h3 style="margin: 0 0 20px 0; color: #333333; font-size: 20px; font-weight: 600;">Key Features:</h3>
+								<ul style="margin: 0; padding-left: 20px; color: #555555; font-size: 15px; line-height: 2;">
+									<li>Premium quality materials</li>
+									<li>Innovative design</li>
+									<li>Customer-tested and approved</li>
+									<li>Limited edition launch pricing</li>
+								</ul>
+							</div>
+							<!-- CTA Button -->
+							<table width="100%" cellpadding="0" cellspacing="0" style="margin: 40px 0;">
+								<tr>
+									<td align="center">
+										<a href="{site_url}" style="display: inline-block; padding: 18px 50px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: #ffffff; text-decoration: none; border-radius: 50px; font-size: 18px; font-weight: 600; box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);">Shop Now - Early Access</a>
+									</td>
+								</tr>
+							</table>
+							<!-- Closing -->
+							<p style="margin: 30px 0 0 0; color: #555555; font-size: 16px; line-height: 1.8;">
+								Thank you for being part of our journey!<br>
+								<strong style="color: #333333;">The {site_name} Team</strong>
+							</p>
+						</td>
+					</tr>
+					<!-- Footer -->
+					<tr>
+						<td style="background-color: #2c3e50; padding: 30px; text-align: center;">
+							<p style="margin: 0 0 15px 0; color: #ffffff; font-size: 16px; font-weight: 600;">{site_name}</p>
+							<p style="margin: 0 0 20px 0; color: #bdc3c7; font-size: 14px;">
+								<a href="{unsubscribe_link}" style="color: #3498db; text-decoration: none;">Unsubscribe</a> |
+								<a href="{site_url}" style="color: #3498db; text-decoration: none;">Visit Website</a>
+							</p>
+							<p style="margin: 0; color: #95a5a6; font-size: 12px;">© ' . date('Y') . ' {site_name}. All rights reserved.</p>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>';
+	}
+	
+	/**
+	 * Flash Sale Template - For urgent sales and discounts
+	 */
+	private function get_flash_sale_template() {
+		return '<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Flash Sale</title>
+</head>
+<body style="margin:0; padding:0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif; background-color: #f5f5f5;">
+	<table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px 0;">
+		<tr>
+			<td align="center">
+				<table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 600px;">
+					<!-- Urgent Header -->
+					<tr>
+						<td style="background: #dc3545; padding: 20px 30px; text-align: center;">
+							<p style="margin: 0; color: #ffffff; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">⚡ FLASH SALE ⚡</p>
+						</td>
+					</tr>
+					<!-- Hero Section -->
+					<tr>
+						<td style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); padding: 60px 30px; text-align: center;">
+							<h1 style="margin: 0 0 15px 0; color: #ffffff; font-size: 48px; font-weight: 900;">70% OFF</h1>
+							<p style="margin: 0 0 20px 0; color: #ffffff; font-size: 24px; font-weight: 600;">Limited Time Only, {first_name}!</p>
+							<div style="background: rgba(255,255,255,0.2); padding: 15px 25px; border-radius: 8px; display: inline-block;">
+								<p style="margin: 0; color: #ffffff; font-size: 16px; font-weight: 600;">⏰ Ends in 24 Hours</p>
+							</div>
+						</td>
+					</tr>
+					<!-- Main Content -->
+					<tr>
+						<td style="padding: 50px 40px;">
+							<h2 style="margin: 0 0 20px 0; color: #333333; font-size: 28px; font-weight: 600;">Don\'t Miss This Deal!</h2>
+							<p style="margin: 0 0 20px 0; color: #555555; font-size: 16px; line-height: 1.8;">
+								Hi {full_name}, we\'re running an exclusive flash sale just for you! Get massive savings on our best-selling products.
+							</p>
+							<!-- Discount Box -->
+							<div style="background: #fff3cd; border: 3px solid #ffc107; padding: 25px; border-radius: 8px; text-align: center; margin: 30px 0;">
+								<p style="margin: 0 0 10px 0; color: #856404; font-size: 18px; font-weight: 600;">Use Code: FLASH70</p>
+								<p style="margin: 0; color: #856404; font-size: 14px;">Apply at checkout to save 70%</p>
+							</div>
+							<!-- CTA Button -->
+							<table width="100%" cellpadding="0" cellspacing="0" style="margin: 40px 0;">
+								<tr>
+									<td align="center">
+										<a href="{site_url}" style="display: inline-block; padding: 18px 50px; background: #dc3545; color: #ffffff; text-decoration: none; border-radius: 50px; font-size: 18px; font-weight: 700; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);">Shop Now - 70% Off</a>
+									</td>
+								</tr>
+							</table>
+							<!-- Urgency -->
+							<p style="margin: 30px 0 0 0; color: #dc3545; font-size: 16px; font-weight: 600; text-align: center;">
+								⏰ This sale won\'t last long - shop now before it\'s gone!
+							</p>
+						</td>
+					</tr>
+					<!-- Footer -->
+					<tr>
+						<td style="background-color: #2c3e50; padding: 30px; text-align: center;">
+							<p style="margin: 0 0 15px 0; color: #ffffff; font-size: 16px; font-weight: 600;">{site_name}</p>
+							<p style="margin: 0 0 20px 0; color: #bdc3c7; font-size: 14px;">
+								<a href="{unsubscribe_link}" style="color: #3498db; text-decoration: none;">Unsubscribe</a> |
+								<a href="{site_url}" style="color: #3498db; text-decoration: none;">Visit Website</a>
+							</p>
+							<p style="margin: 0; color: #95a5a6; font-size: 12px;">© ' . date('Y') . ' {site_name}. All rights reserved.</p>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>';
+	}
+	
+	/**
+	 * Product Recommendation Template - Personalized recommendations
+	 */
+	private function get_product_recommendation_template() {
+		return '<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Product Recommendations</title>
+</head>
+<body style="margin:0; padding:0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif; background-color: #f5f5f5;">
+	<table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px 0;">
+		<tr>
+			<td align="center">
+				<table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 600px;">
+					<!-- Header -->
+					<tr>
+						<td style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 50px 30px; text-align: center;">
+							<h1 style="margin: 0 0 10px 0; color: #ffffff; font-size: 36px; font-weight: 700;">✨ Recommended for You</h1>
+							<p style="margin: 0; color: #ffffff; font-size: 20px; opacity: 0.95;">Handpicked just for {first_name}</p>
+						</td>
+					</tr>
+					<!-- Main Content -->
+					<tr>
+						<td style="padding: 50px 40px;">
+							<h2 style="margin: 0 0 20px 0; color: #333333; font-size: 28px; font-weight: 600;">Hi {full_name},</h2>
+							<p style="margin: 0 0 20px 0; color: #555555; font-size: 16px; line-height: 1.8;">
+								Based on your previous purchases and preferences, we thought you might love these products!
+							</p>
+							<!-- Product Recommendation Box -->
+							<div style="border: 2px solid #e9ecef; border-radius: 8px; padding: 30px; margin: 30px 0; background: #f8f9fa;">
+								<h3 style="margin: 0 0 15px 0; color: #333333; font-size: 22px; font-weight: 600;">🎯 Perfect Match for You</h3>
+								<p style="margin: 0 0 20px 0; color: #555555; font-size: 15px; line-height: 1.8;">
+									We\'ve curated these recommendations based on your shopping history. You\'ve spent {total_spent} with us across {order_count} orders - we know what you like!
+								</p>
+								<!-- Product Features -->
+								<table width="100%" cellpadding="0" cellspacing="0" style="margin: 20px 0;">
+									<tr>
+										<td width="50%" style="padding: 10px; vertical-align: top;">
+											<div style="text-align: center;">
+												<div style="font-size: 36px; margin-bottom: 10px;">⭐</div>
+												<p style="margin: 0; color: #333333; font-size: 14px; font-weight: 600;">Top Rated</p>
+											</div>
+										</td>
+										<td width="50%" style="padding: 10px; vertical-align: top;">
+											<div style="text-align: center;">
+												<div style="font-size: 36px; margin-bottom: 10px;">💎</div>
+												<p style="margin: 0; color: #333333; font-size: 14px; font-weight: 600;">Premium Quality</p>
+											</div>
+										</td>
+									</tr>
+								</table>
+							</div>
+							<!-- CTA Button -->
+							<table width="100%" cellpadding="0" cellspacing="0" style="margin: 40px 0;">
+								<tr>
+									<td align="center">
+										<a href="{site_url}" style="display: inline-block; padding: 18px 50px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: #ffffff; text-decoration: none; border-radius: 50px; font-size: 18px; font-weight: 600; box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);">View Recommendations</a>
+									</td>
+								</tr>
+							</table>
+							<!-- Closing -->
+							<p style="margin: 30px 0 0 0; color: #555555; font-size: 16px; line-height: 1.8;">
+								We hope you find something you love!<br>
+								<strong style="color: #333333;">The {site_name} Team</strong>
+							</p>
+						</td>
+					</tr>
+					<!-- Footer -->
+					<tr>
+						<td style="background-color: #2c3e50; padding: 30px; text-align: center;">
+							<p style="margin: 0 0 15px 0; color: #ffffff; font-size: 16px; font-weight: 600;">{site_name}</p>
+							<p style="margin: 0 0 20px 0; color: #bdc3c7; font-size: 14px;">
+								<a href="{unsubscribe_link}" style="color: #3498db; text-decoration: none;">Unsubscribe</a> |
+								<a href="{site_url}" style="color: #3498db; text-decoration: none;">Visit Website</a>
+							</p>
+							<p style="margin: 0; color: #95a5a6; font-size: 12px;">© ' . date('Y') . ' {site_name}. All rights reserved.</p>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>';
+	}
+	
+	/**
+	 * Abandoned Cart Template - For cart recovery
+	 */
+	private function get_abandoned_cart_template() {
+		return '<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Complete Your Purchase</title>
+</head>
+<body style="margin:0; padding:0; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif; background-color: #f5f5f5;">
+	<table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px 0;">
+		<tr>
+			<td align="center">
+				<table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 600px;">
+					<!-- Header -->
+					<tr>
+						<td style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); padding: 50px 30px; text-align: center;">
+							<h1 style="margin: 0 0 10px 0; color: #ffffff; font-size: 36px; font-weight: 700;">🛒 You Left Something Behind</h1>
+							<p style="margin: 0; color: #ffffff; font-size: 20px; opacity: 0.95;">Complete your purchase, {first_name}!</p>
+						</td>
+					</tr>
+					<!-- Main Content -->
+					<tr>
+						<td style="padding: 50px 40px;">
+							<h2 style="margin: 0 0 20px 0; color: #333333; font-size: 28px; font-weight: 600;">Hi {full_name},</h2>
+							<p style="margin: 0 0 20px 0; color: #555555; font-size: 16px; line-height: 1.8;">
+								We noticed you added some great items to your cart but didn\'t complete your purchase. Don\'t worry - your items are still waiting for you!
+							</p>
+							<!-- Reminder Box -->
+							<div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; border-radius: 4px; margin: 30px 0;">
+								<p style="margin: 0 0 10px 0; color: #856404; font-size: 16px; font-weight: 600;">💡 Quick Reminder:</p>
+								<p style="margin: 0; color: #856404; font-size: 14px; line-height: 1.6;">
+									Your cart is saved for 24 hours. Complete your purchase now to secure your items before they\'re gone!
+								</p>
+							</div>
+							<!-- Benefits -->
+							<div style="margin: 30px 0;">
+								<h3 style="margin: 0 0 15px 0; color: #333333; font-size: 20px; font-weight: 600;">Why Complete Your Order?</h3>
+								<ul style="margin: 0; padding-left: 20px; color: #555555; font-size: 15px; line-height: 2;">
+									<li>✅ Items reserved just for you</li>
+									<li>🚚 Fast and free shipping available</li>
+									<li>🔒 Secure checkout process</li>
+									<li>↩️ Easy returns if needed</li>
+								</ul>
+							</div>
+							<!-- CTA Button -->
+							<table width="100%" cellpadding="0" cellspacing="0" style="margin: 40px 0;">
+								<tr>
+									<td align="center">
+										<a href="{site_url}" style="display: inline-block; padding: 18px 50px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: #ffffff; text-decoration: none; border-radius: 50px; font-size: 18px; font-weight: 600; box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);">Complete My Purchase</a>
+									</td>
+								</tr>
+							</table>
+							<!-- Help Text -->
+							<p style="margin: 30px 0 0 0; color: #666666; font-size: 14px; text-align: center;">
+								Need help? <a href="{site_url}/contact" style="color: #667eea; text-decoration: underline;">Contact our support team</a>
+							</p>
+						</td>
+					</tr>
+					<!-- Footer -->
+					<tr>
+						<td style="background-color: #2c3e50; padding: 30px; text-align: center;">
+							<p style="margin: 0 0 15px 0; color: #ffffff; font-size: 16px; font-weight: 600;">{site_name}</p>
+							<p style="margin: 0 0 20px 0; color: #bdc3c7; font-size: 14px;">
+								<a href="{unsubscribe_link}" style="color: #3498db; text-decoration: none;">Unsubscribe</a> |
+								<a href="{site_url}" style="color: #3498db; text-decoration: none;">Visit Website</a>
+							</p>
+							<p style="margin: 0; color: #95a5a6; font-size: 12px;">© ' . date('Y') . ' {site_name}. All rights reserved.</p>
 						</td>
 					</tr>
 				</table>

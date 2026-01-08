@@ -112,6 +112,7 @@ if ( isset( $_POST['gee_save_settings'] ) && check_admin_referer( 'gee_save_sett
 			'privacy_policy_url' => esc_url_raw( $_POST['privacy_policy_url'] ),
 			'unsubscribe_page_url' => esc_url_raw( $_POST['unsubscribe_page_url'] ),
 			'gdpr_compliance_mode' => isset( $_POST['gdpr_compliance_mode'] ) ? 1 : 0,
+			'test_email' => isset( $_POST['test_email'] ) ? sanitize_email( $_POST['test_email'] ) : get_option( 'admin_email' ),
 		);
 	
 	$settings_model->update_settings( $settings );
@@ -245,6 +246,22 @@ $api_endpoint = home_url( '/wp-json/gee-crm/v1/subscribe' );
 				<button id="gee-crm-sync-btn" class="gee-crm-btn gee-crm-btn-primary">Sync WooCommerce Customers</button>
 				<p id="gee-crm-sync-status" style="margin-top: 10px; color: #666;"></p>
 			</div>
+			
+			<!-- Test Email Section -->
+			<div style="background:#f0f8ff; padding:20px; border-left:4px solid #2271b1; border-radius:4px; margin-bottom:30px;">
+				<h3 style="margin-top:0; color:#2271b1;">Test Email</h3>
+				<p style="color:#666; margin-bottom:20px;">
+					Send a test email to verify your email configuration and template rendering. This is useful for testing email templates before sending campaigns.
+				</p>
+				<div style="margin-bottom:15px;">
+					<label><strong>Test Email Address:</strong></label><br>
+					<input type="email" name="test_email" id="gee-crm-test-email" value="<?php echo esc_attr( $settings['test_email'] ?? get_option( 'admin_email' ) ); ?>" style="width:100%; max-width:400px; padding:8px; margin-top:5px;" placeholder="test@example.com">
+					<br>
+					<small style="color:#666;">Enter the email address where you want to receive test emails. This will be saved when you click "Save Settings".</small>
+				</div>
+				<button id="gee-crm-send-test-email" class="gee-crm-btn gee-crm-btn-primary">Send Test Email</button>
+				<p id="gee-crm-test-email-status" style="margin-top: 10px; color: #666;"></p>
+			</div>
 		</div>
 		
 		<div style="margin-top:30px; border-top:1px solid #e5e5e5; padding-top:20px;">
@@ -294,6 +311,44 @@ jQuery(document).ready(function($) {
 		// Show/hide tab content
 		$('.gee-settings-tab-content').hide();
 		$('#tab-' + tab).show();
+	});
+	
+	// Send Test Email
+	$('#gee-crm-send-test-email').on('click', function() {
+		var $btn = $(this);
+		var $status = $('#gee-crm-test-email-status');
+		var testEmail = $('#gee-crm-test-email').val();
+		
+		if (!testEmail || !testEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+			$status.html('<span style="color:#dc3545;">Please enter a valid email address.</span>');
+			return;
+		}
+		
+		$btn.prop('disabled', true).text('Sending...');
+		$status.html('<span style="color:#666;">Sending test email...</span>');
+		
+		$.ajax({
+			url: typeof ajaxurl !== 'undefined' ? ajaxurl : (typeof geeWooCRM !== 'undefined' ? geeWooCRM.ajaxurl : '<?php echo admin_url( "admin-ajax.php" ); ?>'),
+			type: 'POST',
+			data: {
+				action: 'gee_crm_send_test_email',
+				email: testEmail,
+				nonce: '<?php echo wp_create_nonce( 'gee_crm_test_email' ); ?>'
+			},
+			success: function(response) {
+				if (response.success) {
+					$status.html('<span style="color:#28a745;">✓ Test email sent successfully to ' + testEmail + '</span>');
+				} else {
+					$status.html('<span style="color:#dc3545;">✗ Error: ' + (response.data || 'Failed to send email') + '</span>');
+				}
+			},
+			error: function() {
+				$status.html('<span style="color:#dc3545;">✗ Error: Failed to send test email. Please check your server configuration.</span>');
+			},
+			complete: function() {
+				$btn.prop('disabled', false).text('Send Test Email');
+			}
+		});
 	});
 });
 </script>

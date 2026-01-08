@@ -1,10 +1,10 @@
 <?php
 /**
- * Plugin Name: Gee Woo CRM
- * Description: A minimal CRM for WooCommerce (CRM + Email Marketing + Form Integration).
+ * Plugin Name: WooCommerce Email Marketing CRM
+ * Description: A CRM for WooCommerce (CRM + Email Marketing + Form Integration).
  * Version:     1.0.0
  * Author:      Akhil Vijayan
- * Text Domain: gee-woo-crm
+ * Text Domain: gee-wooocommerce-email-marketing-crm
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
