@@ -207,11 +207,34 @@ endif;
                 <input type="text" name="subject" value="<?php echo $editing_template ? esc_attr( $editing_template->subject ) : ''; ?>" required style="width:100%; max-width:600px; padding:8px;" placeholder="e.g. Welcome to our newsletter!">
             </p>
 
-            <p>
-                <label><strong>Email Content (HTML):</strong></label><br>
-                <small style="color:#666;">You can use HTML tags and variables like {first_name}, {last_name}, {email}</small><br>
-                <textarea name="content_html" id="template-content" rows="15" required style="width:100%; font-family:monospace; padding:8px;"><?php echo $editing_template ? esc_textarea( $editing_template->content_html ) : ''; ?></textarea>
-            </p>
+            <div style="margin-bottom:20px;">
+                <label><strong>Email Content *</strong></label><br>
+                <small style="color:#666;">Use the visual editor to format text, add images, links, and create professional email templates. You can use variables like {first_name}, {email}, etc.</small>
+                <?php
+                $template_editor_content = $editing_template ? $editing_template->content_html : '';
+                $template_editor_id = 'template-content';
+                $template_settings = array(
+                    'textarea_name' => 'content_html',
+                    'textarea_rows' => 20,
+                    'media_buttons' => true, // Enable image/media buttons
+                    'teeny' => false, // Full editor, not minimal
+                    'tinymce' => array(
+                        'toolbar1' => 'formatselect,bold,italic,underline,strikethrough,|,bullist,numlist,|,blockquote,|,alignleft,aligncenter,alignright,alignjustify,|,link,unlink,|,forecolor,backcolor,|,hr,|,removeformat,|,fullscreen',
+                        'toolbar2' => 'undo,redo,|,outdent,indent,|,image,|,charmap,|,code',
+                        'menubar' => true,
+                        'plugins' => 'lists,link,paste,hr,textcolor,colorpicker,charmap,image,wordpress,wpautoresize,wpeditimage,wplink,wpdialogs,wpview',
+                        'body_class' => 'email-content-editor',
+                        'height' => 500,
+                    ),
+                    'quicktags' => true,
+                    'editor_height' => 500,
+                    'drag_drop_upload' => true,
+                );
+                wp_editor( $template_editor_content, $template_editor_id, $template_settings );
+                ?>
+            </div>
+
+
 
             <p>
                 <label>
@@ -275,6 +298,7 @@ endif;
             <?php endif; ?>
         </form>
     </div>
+
 
     <table class="gee-crm-table">
         <thead>

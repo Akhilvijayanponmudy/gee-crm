@@ -1,3 +1,71 @@
+/* Development Banner */
+.gee-crm-dev-banner {
+	background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+	color: #fff;
+	padding: 12px 20px;
+	margin: 0 -20px 0 -20px;
+	position: relative;
+	box-shadow: 0 2px 4px rgba(0,0,0,.1);
+	z-index: 101;
+}
+
+.gee-crm-dev-banner-content {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 14px;
+	max-width: 1600px;
+	margin: 0 auto;
+	position: relative;
+}
+
+.gee-crm-dev-banner-content .dashicons {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+	flex-shrink: 0;
+}
+
+.gee-crm-dev-banner-content strong {
+	font-weight: 600;
+}
+
+.gee-crm-dev-banner-content a {
+	color: #fff;
+	text-decoration: underline;
+	font-weight: 600;
+}
+
+.gee-crm-dev-banner-content a:hover {
+	text-decoration: none;
+	opacity: 0.9;
+}
+
+.gee-crm-dev-banner-dismiss {
+	background: rgba(255,255,255,0.2);
+	border: none;
+	color: #fff;
+	cursor: pointer;
+	padding: 4px 8px;
+	border-radius: 3px;
+	margin-left: auto;
+	transition: background 0.2s;
+}
+
+.gee-crm-dev-banner-dismiss:hover {
+	background: rgba(255,255,255,0.3);
+}
+
+.gee-crm-dev-banner-dismiss .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.gee-crm-dev-banner.hidden {
+	display: none;
+}
+
 .gee-woo-crm-wrapper {
 	display: flex;
 	flex-direction: column;
@@ -96,7 +164,8 @@
 	margin-left: auto;
 }
 
-.gee-woo-crm-nav-dropdown:hover .gee-woo-crm-dropdown-menu {
+.gee-woo-crm-nav-dropdown:hover .gee-woo-crm-dropdown-menu,
+.gee-woo-crm-dropdown-menu:hover {
 	display: block;
 }
 
@@ -110,8 +179,20 @@
 	box-shadow: 0 2px 8px rgba(0,0,0,.1);
 	border-radius: 4px;
 	min-width: 200px;
-	margin-top: 5px;
+	margin-top: 0;
+	padding-top: 3px;
 	z-index: 1000;
+}
+
+/* Create an invisible bridge area to prevent gap when moving mouse from button to menu */
+.gee-woo-crm-dropdown-menu::before {
+	content: '';
+	position: absolute;
+	top: -3px;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: transparent;
 }
 
 .gee-woo-crm-dropdown-item {
@@ -181,28 +262,6 @@
 	align-items: center;
 }
 
-.gee-woo-crm-page-options {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	padding: 8px 12px;
-	color: #50575e;
-	font-size: 13px;
-	cursor: pointer;
-	border-radius: 4px;
-	transition: all 0.2s;
-}
-
-.gee-woo-crm-page-options:hover {
-	background: #f6f7f7;
-	color: #2271b1;
-}
-
-.gee-woo-crm-page-options .dashicons {
-	font-size: 16px;
-	width: 16px;
-	height: 16px;
-}
 
 .gee-woo-crm-content {
 	padding: 30px;

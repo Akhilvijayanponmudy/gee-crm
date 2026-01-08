@@ -34,15 +34,18 @@ if ( isset( $_POST['gee_save_campaign'] ) && check_admin_referer( 'gee_save_camp
         $recipients = $campaign_model->get_recipients( $targeting );
         $total_recipients = count( $recipients );
         
-        // Scheduling
+        // Scheduling (Coming Soon - disabled for now)
         $send_type = sanitize_text_field( $_POST['send_type'] );
         $scheduled_at = null;
         $status = 'draft';
         
-        if ( $send_type == 'schedule' && ! empty( $_POST['scheduled_date'] ) && ! empty( $_POST['scheduled_time'] ) ) {
-            $scheduled_at = sanitize_text_field( $_POST['scheduled_date'] ) . ' ' . sanitize_text_field( $_POST['scheduled_time'] ) . ':00';
-            $status = 'scheduled';
-        } elseif ( $send_type == 'now' ) {
+        // Schedule feature is coming soon - ignore schedule requests
+        if ( $send_type == 'schedule' ) {
+            // Schedule feature not yet available - treat as draft
+            $send_type = 'draft';
+        }
+        
+        if ( $send_type == 'now' ) {
             $status = 'draft'; // Will be sent immediately after save
         }
         
@@ -272,9 +275,58 @@ if ( $action == 'view' && isset( $_GET['id'] ) ) {
             </div>
             
             <div style="margin-bottom:20px;">
-                <label><strong>Email Content (HTML) *</strong></label><br>
-                <small style="color:#666;">You can use variables like {first_name}, {full_name}, {email}, {total_spent}, etc.</small><br>
-                <textarea name="content_html" id="campaign-content" rows="15" required style="width:100%; font-family:monospace; padding:8px; margin-top:5px;"><?php echo $editing_campaign ? esc_textarea( $editing_campaign->content_html ) : ''; ?></textarea>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <div>
+                        <label><strong>Email Content *</strong></label><br>
+                        <small style="color:#666;">You can use variables like {first_name}, {full_name}, {email}, {total_spent}, etc.</small>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <button type="button" id="switch-to-visual" class="gee-crm-btn" style="display:none; background:#2271b1; color:#fff; border-color:#2271b1;">
+                            <span class="dashicons dashicons-visibility" style="font-size:16px; width:16px; height:16px; line-height:1.5; vertical-align:middle;"></span> Visual
+                        </button>
+                        <button type="button" id="switch-to-html" class="gee-crm-btn" style="background:#666; color:#fff; border-color:#666;">
+                            <span class="dashicons dashicons-editor-code" style="font-size:16px; width:16px; height:16px; line-height:1.5; vertical-align:middle;"></span> HTML
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Visual Editor Container -->
+                <div id="visual-editor-container" style="margin-top:5px;">
+                    <?php
+                    $editor_content = $editing_campaign ? $editing_campaign->content_html : '';
+                    $editor_id = 'campaign-content-visual';
+                    $settings = array(
+                        'textarea_name' => 'content_html_visual',
+                        'textarea_rows' => 20,
+                        'media_buttons' => false,
+                        'tinymce' => array(
+                            'toolbar1' => 'formatselect,bold,italic,underline,strikethrough,|,bullist,numlist,|,blockquote,|,alignleft,aligncenter,alignright,alignjustify,|,link,unlink,|,forecolor,backcolor,|,removeformat',
+                            'toolbar2' => '',
+                            'toolbar3' => '',
+                            'toolbar4' => '',
+                            'menubar' => false,
+                            'plugins' => 'lists,link,colorpicker,textcolor',
+                            'content_css' => false,
+                            'body_class' => 'email-content-editor',
+                            'invalid_elements' => 'img',
+                            'paste_as_text' => false,
+                            'paste_auto_cleanup_on_paste' => true,
+                            'paste_remove_styles' => false,
+                            'paste_remove_spans' => false,
+                            'paste_strip_class_attributes' => 'none',
+                            'height' => 400,
+                        ),
+                        'quicktags' => false,
+                        'drag_drop_upload' => false,
+                    );
+                    wp_editor( $editor_content, $editor_id, $settings );
+                    ?>
+                </div>
+                
+                <!-- HTML Editor Container -->
+                <div id="html-editor-container" style="display:none; margin-top:5px;">
+                    <textarea name="content_html" id="campaign-content" rows="15" required style="width:100%; font-family:monospace; padding:8px; font-size:13px; line-height:1.5;"><?php echo $editing_campaign ? esc_textarea( $editing_campaign->content_html ) : ''; ?></textarea>
+                </div>
             </div>
             
             <div style="background:#fff3cd; border-left:4px solid #ffc107; padding:15px; margin-bottom:20px; border-radius:4px;">
@@ -438,13 +490,14 @@ if ( $action == 'view' && isset( $_GET['id'] ) ) {
                 </div>
                 
                 <div style="margin-bottom:15px;">
-                    <label>
-                        <input type="radio" name="send_type" value="schedule" <?php checked( $editing_campaign && $editing_campaign->status == 'scheduled', true ); ?>>
-                        <strong>Schedule for Later</strong>
-                    </label>
-                    <div id="schedule-options" style="margin-left:25px; margin-top:10px; <?php echo ( ! $editing_campaign || $editing_campaign->status != 'scheduled' ) ? 'display:none;' : ''; ?>">
-                        <input type="date" name="scheduled_date" value="<?php echo $editing_campaign && $editing_campaign->scheduled_at ? date( 'Y-m-d', strtotime( $editing_campaign->scheduled_at ) ) : date( 'Y-m-d' ); ?>" style="padding:8px; margin-right:10px;">
-                        <input type="time" name="scheduled_time" value="<?php echo $editing_campaign && $editing_campaign->scheduled_at ? date( 'H:i', strtotime( $editing_campaign->scheduled_at ) ) : date( 'H:i', strtotime( '+1 hour' ) ); ?>" style="padding:8px;">
+                    <div class="gee-crm-coming-soon" style="padding:15px; background:#fff3cd; border:1px solid #ffc107; border-radius:6px; margin-top:10px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span class="dashicons dashicons-clock" style="font-size:24px; color:#ffc107;"></span>
+                            <div>
+                                <strong style="color:#856404;">Schedule for Later - Coming Soon</strong>
+                                <p style="margin:5px 0 0 0; font-size:13px; color:#856404;">Schedule your campaigns to send automatically at a future date and time. This feature will be available in a future update.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -458,6 +511,94 @@ if ( $action == 'view' && isset( $_GET['id'] ) ) {
     
     <script>
     jQuery(document).ready(function($) {
+        // Editor Toggle Functionality
+        var visualEditor = null;
+        var htmlEditor = $('#campaign-content');
+        var visualContainer = $('#visual-editor-container');
+        var htmlContainer = $('#html-editor-container');
+        var switchToVisualBtn = $('#switch-to-visual');
+        var switchToHtmlBtn = $('#switch-to-html');
+        
+        // Initialize TinyMCE reference - wait for WordPress to initialize it
+        function initVisualEditor() {
+            if (typeof tinymce !== 'undefined') {
+                visualEditor = tinymce.get('campaign-content-visual');
+                if (!visualEditor) {
+                    // Try again after a short delay
+                    setTimeout(initVisualEditor, 300);
+                } else {
+                    // Editor is ready - block image insertion
+                    visualEditor.on('BeforeSetContent', function(e) {
+                        if (e.content && e.content.match(/<img[^>]*>/i)) {
+                            e.content = e.content.replace(/<img[^>]*>/gi, '');
+                        }
+                    });
+                    
+                    // Block paste of images
+                    visualEditor.on('PastePostProcess', function(e) {
+                        if (e.node && e.node.innerHTML) {
+                            e.node.innerHTML = e.node.innerHTML.replace(/<img[^>]*>/gi, '');
+                        }
+                    });
+                }
+            } else {
+                // TinyMCE not loaded yet, wait a bit longer
+                setTimeout(initVisualEditor, 500);
+            }
+        }
+        
+        // Start initialization after DOM and WordPress scripts are ready
+        setTimeout(function() {
+            initVisualEditor();
+        }, 1000);
+        
+        // Switch to Visual Editor
+        switchToVisualBtn.on('click', function() {
+            var htmlContent = htmlEditor.val();
+            if (visualEditor) {
+                visualEditor.setContent(htmlContent);
+                visualEditor.focus();
+            } else {
+                $('#campaign-content-visual').val(htmlContent);
+            }
+            visualContainer.show();
+            htmlContainer.hide();
+            switchToVisualBtn.hide();
+            switchToHtmlBtn.show();
+        });
+        
+        // Switch to HTML Editor
+        switchToHtmlBtn.on('click', function() {
+            var htmlContent = '';
+            if (visualEditor) {
+                htmlContent = visualEditor.getContent();
+            } else {
+                htmlContent = $('#campaign-content-visual').val();
+            }
+            htmlEditor.val(htmlContent);
+            htmlContainer.show();
+            visualContainer.hide();
+            switchToHtmlBtn.hide();
+            switchToVisualBtn.show();
+            htmlEditor.focus();
+        });
+        
+        // Sync content before form submission - always sync to the HTML textarea which has name="content_html"
+        $('#campaign-form').on('submit', function(e) {
+            var htmlContent = '';
+            if (visualContainer.is(':visible')) {
+                // Get content from visual editor
+                if (visualEditor) {
+                    htmlContent = visualEditor.getContent();
+                } else {
+                    htmlContent = $('#campaign-content-visual').val();
+                }
+                // Sync to HTML textarea (which has the form field name)
+                htmlEditor.val(htmlContent);
+            }
+            // If HTML editor is visible, it already has the content, so no sync needed
+        });
+        
         // Template selection
         $('#template-select').on('change', function() {
             var templateId = $(this).val();
@@ -472,7 +613,13 @@ if ( $action == 'view' && isset( $_GET['id'] ) ) {
                     },
                     success: function(response) {
                         if (response.success && response.data) {
-                            $('#campaign-content').val(response.data.content_html);
+                            var content = response.data.content_html;
+                            htmlEditor.val(content);
+                            if (visualEditor) {
+                                visualEditor.setContent(content);
+                            } else {
+                                $('#campaign-content-visual').val(content);
+                            }
                             $('input[name="subject"]').val(response.data.subject);
                         }
                     }
@@ -491,14 +638,7 @@ if ( $action == 'view' && isset( $_GET['id'] ) ) {
             }
         });
         
-        // Send type toggle
-        $('input[name="send_type"]').on('change', function() {
-            var type = $(this).val();
-            $('#schedule-options').hide();
-            if (type == 'schedule') {
-                $('#schedule-options').show();
-            }
-        });
+        // Send type toggle (Schedule feature coming soon - disabled)
         
         // Tag selection functionality
         var selectedTags = <?php echo isset( $targeting['tags'] ) ? json_encode( $targeting['tags'] ) : '[]'; ?>;

@@ -5,7 +5,6 @@
  * @package   Gee_Woo_CRM
  * @author    Akhil Vijayan
  * @license   GPL-2.0+
- * @link      https://google.com
  */
 
 // If uninstall not called from WordPress, then exit.

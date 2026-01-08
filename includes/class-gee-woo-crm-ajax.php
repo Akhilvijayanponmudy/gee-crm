@@ -12,6 +12,7 @@ class Gee_Woo_CRM_Ajax {
         add_action( 'wp_ajax_gee_get_template', array( $this, 'get_template' ) );
         add_action( 'wp_ajax_gee_update_marketing_consent', array( $this, 'update_marketing_consent' ) );
         add_action( 'wp_ajax_gee_import_contacts', array( $this, 'import_contacts' ) );
+        add_action( 'wp_ajax_gee_crm_send_test_email', array( $this, 'send_test_email' ) );
 	}
 
 	public function sync_contacts() {
@@ -298,5 +299,57 @@ class Gee_Woo_CRM_Ajax {
             'skipped' => $skipped,
             'errors' => $errors
         ) );
+    }
+
+    public function send_test_email() {
+        check_ajax_referer( 'gee_crm_test_email', 'nonce' );
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( 'Permission denied' );
+        }
+
+        $test_email = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+        if ( empty( $test_email ) || ! is_email( $test_email ) ) {
+            wp_send_json_error( 'Invalid email address' );
+        }
+
+        require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-email-template.php';
+        $template_model = new Gee_Woo_CRM_Email_Template();
+        
+        // Get default marketing template for test
+        $template = $template_model->get_default_template();
+        if ( ! $template ) {
+            wp_send_json_error( 'No email template found' );
+        }
+
+        // Replace variables with test data
+        $subject = str_replace( 
+            array( '{first_name}', '{full_name}', '{site_name}', '{current_date}' ),
+            array( 'Test', 'Test User', get_bloginfo( 'name' ), date( 'F j, Y' ) ),
+            $template->subject
+        );
+
+        $content = str_replace(
+            array( '{first_name}', '{full_name}', '{email}', '{site_name}', '{site_url}', '{current_date}', '{unsubscribe_link}' ),
+            array( 
+                'Test', 
+                'Test User', 
+                $test_email,
+                get_bloginfo( 'name' ), 
+                home_url(), 
+                date( 'F j, Y' ),
+                home_url( '/wp-json/gee-crm/v1/unsubscribe?email=' . urlencode( $test_email ) . '&token=test_token' )
+            ),
+            $template->content_html
+        );
+
+        // Send test email
+        $headers = array( 'Content-Type: text/html; charset=UTF-8' );
+        $sent = wp_mail( $test_email, $subject, $content, $headers );
+
+        if ( $sent ) {
+            wp_send_json_success( array( 'message' => 'Test email sent successfully!' ) );
+        } else {
+            wp_send_json_error( 'Failed to send email. Please check your WordPress mail configuration.' );
+        }
     }
 }
