@@ -275,7 +275,7 @@ function gee_woo_crm_handle_unsubscribe( $request ) {
 	</div>
 </body>
 </html>';
-		echo $html;
+		echo wp_kses_post( $html );
 		exit;
 	}
 	
@@ -383,7 +383,7 @@ function gee_woo_crm_handle_unsubscribe( $request ) {
 	</div>
 </body>
 </html>';
-		echo $html;
+		echo wp_kses_post( $html );
 		exit;
 	}
 	

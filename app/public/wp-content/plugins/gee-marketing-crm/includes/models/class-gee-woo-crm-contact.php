@@ -135,24 +135,20 @@ class Gee_Woo_CRM_Contact {
 
 		if ( $exists ) {
 			$update_data = array();
-			$format = array();
 			
 			// Only update first_name if provided and not empty
 			if ( isset( $data['first_name'] ) && ! empty( trim( $data['first_name'] ) ) ) {
 				$update_data['first_name'] = sanitize_text_field( $data['first_name'] );
-				$format[] = '%s';
 			}
 			
 			// Only update last_name if provided and not empty
 			if ( isset( $data['last_name'] ) && ! empty( trim( $data['last_name'] ) ) ) {
 				$update_data['last_name'] = sanitize_text_field( $data['last_name'] );
-				$format[] = '%s';
 			}
 			
 			// Only update phone if provided and not empty
 			if ( isset( $data['phone'] ) && ! empty( trim( $data['phone'] ) ) ) {
 				$update_data['phone'] = sanitize_text_field( $data['phone'] );
-				$format[] = '%s';
 			}
 			
 			// Handle wp_user_id - try to find WordPress user by email if not provided
@@ -172,24 +168,35 @@ class Gee_Woo_CRM_Contact {
 			
 			if ( $wp_user_id ) {
 				$update_data['wp_user_id'] = $wp_user_id;
-				$format[] = '%d';
 			}
 			
 			// Update marketing consent if provided
 			if ( isset( $data['marketing_consent'] ) ) {
 				$update_data['marketing_consent'] = $data['marketing_consent'] ? 1 : 0;
-				$format[] = '%d';
 				if ( $data['marketing_consent'] ) {
 					$update_data['consent_date'] = current_time( 'mysql' );
-					$format[] = '%s';
 				} else {
 					$update_data['consent_date'] = null;
-					$format[] = '%s';
 				}
 			}
 			
 			// Only update if there's data to update
 			if ( ! empty( $update_data ) ) {
+				// Build format array to match update_data keys in the same order
+				// $wpdb->update() expects format array as simple array (not associative) matching data order
+				$format = array();
+				foreach ( $update_data as $key => $value ) {
+					if ( $key === 'wp_user_id' ) {
+						$format[] = '%d';
+					} elseif ( $key === 'marketing_consent' ) {
+						$format[] = '%d';
+					} elseif ( $key === 'consent_date' ) {
+						$format[] = '%s'; // NULL is handled as string in WordPress
+					} else {
+						$format[] = '%s';
+					}
+				}
+				
 				$wpdb->update(
 					$this->table_name,
 					$update_data,

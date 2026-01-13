@@ -706,8 +706,14 @@ class Gee_Woo_CRM_Email_Template {
 		if ( ! empty( $token ) ) {
 			$unsubscribe_link = home_url( '/wp-json/gee-crm/v1/unsubscribe?email=' . urlencode( $email ) . '&token=' . urlencode( $token ) );
 		} else {
-			// Fallback (shouldn't happen, but prevent broken links)
-			$unsubscribe_link = home_url( '/wp-json/gee-crm/v1/unsubscribe?email=' . urlencode( $email ) );
+			// Security: Never generate unsubscribe links without tokens
+			// If contact_id is 0 or contact lookup fails, we cannot securely unsubscribe
+			// Log the issue and return content without unsubscribe link
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( 'Gee CRM: Cannot generate secure unsubscribe link - missing contact_id or token for email: ' . $email );
+			}
+			// Return content without unsubscribe link - better than insecure link
+			return $content;
 		}
 		
 		// Check if unsubscribe link already exists

@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-campaign.php';
 require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-tag.php';
 require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-segment.php';
@@ -587,14 +591,26 @@ if ( $action == 'view' && isset( $_GET['id'] ) ) {
         $('#campaign-form').on('submit', function(e) {
             var htmlContent = '';
             if (visualContainer.is(':visible')) {
-                // Get content from visual editor
-                if (visualEditor) {
+                // Get content from visual editor - ensure editor is initialized
+                if (visualEditor && typeof visualEditor.getContent === 'function') {
                     htmlContent = visualEditor.getContent();
+                } else if (typeof tinymce !== 'undefined') {
+                    // Try to get editor instance directly
+                    var editor = tinymce.get('campaign-content-visual');
+                    if (editor && typeof editor.getContent === 'function') {
+                        htmlContent = editor.getContent();
+                    } else {
+                        // Fallback to textarea value if editor not ready
+                        htmlContent = $('#campaign-content-visual').val() || '';
+                    }
                 } else {
-                    htmlContent = $('#campaign-content-visual').val();
+                    // Fallback to textarea value
+                    htmlContent = $('#campaign-content-visual').val() || '';
                 }
                 // Sync to HTML textarea (which has the form field name)
-                htmlEditor.val(htmlContent);
+                if (htmlContent) {
+                    htmlEditor.val(htmlContent);
+                }
             }
             // If HTML editor is visible, it already has the content, so no sync needed
         });

@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 require_once GEE_WOO_CRM_PATH . 'includes/models/class-gee-woo-crm-email-template.php';
 
 $template_model = new Gee_Woo_CRM_Email_Template();

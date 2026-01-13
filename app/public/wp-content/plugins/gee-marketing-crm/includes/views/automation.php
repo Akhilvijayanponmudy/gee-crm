@@ -1,4 +1,8 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 // Coming Soon Page
 ?>
 <div class="gee-crm-card" style="text-align: center; padding: 80px 40px;">
