@@ -42,7 +42,7 @@ function gee_get_form_checkbox_html( $settings_model, $default_tag_id = 0 ) {
 		$input_attributes .= ' data-gee-crm-tag-id="' . esc_attr( $default_tag ) . '"';
 	}
 	
-	$snippet = '<div style="margin:15px 0;" data-gee-crm-tag-id="' . esc_attr( $default_tag ) . '">
+	$snippet = '<div style="margin:15px 0;">
 	<label>
 		<input ' . $input_attributes . '>
 		I agree to receive marketing emails';
@@ -419,12 +419,12 @@ $api_endpoint = home_url( '/wp-json/gee-crm/v1/subscribe' );
 					<small style="color:#666;">Link to your privacy policy page. This will be included in form snippets and helps with GDPR compliance.</small>
 				</div>
 				
-				<div style="margin-bottom:15px;">
+				<!-- <div style="margin-bottom:15px;">
 					<label><strong>Unsubscribe Page URL:</strong></label><br>
-					<input type="url" name="unsubscribe_page_url" value="<?php echo esc_url( $settings['unsubscribe_page_url'] ); ?>" style="width:100%; max-width:600px; padding:8px; margin-top:5px;" placeholder="https://yoursite.com/unsubscribe">
+					<input type="url" name="unsubscribe_page_url" value="<?php // echo esc_url( $settings['unsubscribe_page_url'] ); ?>" style="width:100%; max-width:600px; padding:8px; margin-top:5px;" placeholder="https://yoursite.com/unsubscribe">
 					<br>
 					<small style="color:#666;">Page where users can unsubscribe from marketing emails. You can use the endpoint: <code><?php echo home_url( '/wp-json/gee-crm/v1/unsubscribe?email={email}' ); ?></code></small>
-				</div>
+				</div> -->
 			</div>
 		</div>
 		
@@ -501,7 +501,7 @@ jQuery(document).ready(function($) {
 		if (defaultTagId > 0) {
 			inputAttr += ' data-gee-crm-tag-id="' + defaultTagId + '"';
 		}
-		var checkboxHtml = '<div style="margin:15px 0;" data-gee-crm-tag-id="' + defaultTagId + '">\n' +
+		var checkboxHtml = '<div style="margin:15px 0;">\n' +
 			'\t<label>\n' +
 			'\t\t<input ' + inputAttr + '>\n' +
 			'\t\tI agree to receive marketing emails' + privacyLink + '\n' +
