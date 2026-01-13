@@ -1,0 +1,13 @@
+01-05-2026 @ 11:23:29 - ---[ New import started at 2026-01-05 11:23:29 ] PHP Memory: 256 MB, WP Memory: 40 MB
+01-05-2026 @ 11:23:29 - Preparing for import.
+01-05-2026 @ 11:23:29 - Row :1 - Parsing item.
+01-05-2026 @ 11:23:29 - Importing as new product ID:60
+01-05-2026 @ 11:23:29 - Row :1 - Processing item.
+01-05-2026 @ 11:23:29 - Found simple product object. ID:60
+01-05-2026 @ 11:23:29 - Row :1 - Product imported successfully.
+01-05-2026 @ 11:23:29 - Row :2 - Parsing item.
+01-05-2026 @ 11:23:29 - Importing as new product ID:61
+01-05-2026 @ 11:23:29 - Row :2 - Processing item.
+01-05-2026 @ 11:23:29 - Found simple product object. ID:61
+01-05-2026 @ 11:23:30 - Row :2 - Product imported successfully.
+01-05-2026 @ 11:23:30 - ---[ Import ended at 2026-01-05 11:23:30]---

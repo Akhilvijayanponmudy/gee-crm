@@ -1,0 +1,6 @@
+"user_login,user_email,first_name,last_name,role,billing_phone,billing_country"
+"john_doe,john@example.com,John,Doe,customer,9876543210,US"
+"jane_smith,jane@gmail.com,Jane,Smith,customer,9123456780,IN"
+"mark_guest,mark@yahoo.com,Mark,Guest,customer,,UK"
+"vip_customer,vip@company.com,VIP,Customer,customer,9988776655,US"
+"admin_user,admin@test.com,Admin,User,administrator,9999999999,US"

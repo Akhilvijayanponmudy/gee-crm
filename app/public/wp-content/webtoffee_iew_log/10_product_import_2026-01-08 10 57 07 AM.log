@@ -1,0 +1,233 @@
+01-08-2026 @ 10:57:07 - ---[ New import started at 2026-01-08 10:57:07 ] PHP Memory: 256 MB, WP Memory: 40 MB
+01-08-2026 @ 10:57:07 - Preparing for import.
+01-08-2026 @ 10:57:07 - Row :1 - Parsing item.
+01-08-2026 @ 10:57:07 - Importing as new product ID:4001
+01-08-2026 @ 10:57:07 - Row :1 - Processing item.
+01-08-2026 @ 10:57:07 - Found simple product object. ID:4001
+01-08-2026 @ 10:57:07 - Setting Featured Image. URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/01/292839.jpg
+01-08-2026 @ 10:57:09 - Attachment ID:9159
+01-08-2026 @ 10:57:09 - Row :1 - Product imported successfully.
+01-08-2026 @ 10:57:09 - Row :2 - Parsing item.
+01-08-2026 @ 10:57:09 - Importing as new product ID:8039806012178
+01-08-2026 @ 10:57:09 - Row :2 - Processing item.
+01-08-2026 @ 10:57:09 - Found simple product object. ID:8039806012178
+01-08-2026 @ 10:57:09 - Row :2 - Product imported successfully.
+01-08-2026 @ 10:57:09 - Row :3 - Parsing item.
+01-08-2026 @ 10:57:09 - Importing as new product ID:8039806012179
+01-08-2026 @ 10:57:09 - Row :3 - Processing item.
+01-08-2026 @ 10:57:09 - Found simple product object. ID:8039806012179
+01-08-2026 @ 10:57:10 - Row :3 - Product imported successfully.
+01-08-2026 @ 10:57:10 - Row :4 - Parsing item.
+01-08-2026 @ 10:57:10 - Importing as new product ID:8039806012180
+01-08-2026 @ 10:57:10 - Row :4 - Processing item.
+01-08-2026 @ 10:57:10 - Found simple product object. ID:8039806012180
+01-08-2026 @ 10:57:10 - Row :4 - Product imported successfully.
+01-08-2026 @ 10:57:10 - Row :5 - Parsing item.
+01-08-2026 @ 10:57:10 - Importing as new product ID:8039806012183
+01-08-2026 @ 10:57:10 - Row :5 - Processing item.
+01-08-2026 @ 10:57:10 - Found simple product object. ID:8039806012183
+01-08-2026 @ 10:57:10 - Row :5 - Processing failed. Reason: Invalid or duplicated SKU.
+01-08-2026 @ 10:57:10 - Row :6 - Parsing item.
+01-08-2026 @ 10:57:10 - Importing as new product ID:8039806012184
+01-08-2026 @ 10:57:10 - Row :6 - Processing item.
+01-08-2026 @ 10:57:10 - Found simple product object. ID:8039806012184
+01-08-2026 @ 10:57:10 - Row :6 - Processing failed. Reason: Invalid or duplicated SKU.
+01-08-2026 @ 10:57:10 - Row :7 - Parsing item.
+01-08-2026 @ 10:57:10 - Importing as new product ID:8039806012185
+01-08-2026 @ 10:57:10 - Row :7 - Processing item.
+01-08-2026 @ 10:57:10 - Found simple product object. ID:8039806012185
+01-08-2026 @ 10:57:10 - Row :7 - Processing failed. Reason: Invalid or duplicated SKU.
+01-08-2026 @ 10:57:10 - Row :8 - Parsing item.
+01-08-2026 @ 10:57:10 - Importing as new product ID:8039806012492
+01-08-2026 @ 10:57:10 - Row :8 - Processing item.
+01-08-2026 @ 10:57:10 - Found variable product object. ID:8039806012492
+01-08-2026 @ 10:57:11 - Row :8 - Product imported successfully.
+01-08-2026 @ 10:57:11 - Row :9 - Parsing item.
+01-08-2026 @ 10:57:11 - Importing as new product ID:8039806012493
+01-08-2026 @ 10:57:11 - Row :9 - Processing item.
+01-08-2026 @ 10:57:11 - Found variation product object. ID:8039806012493
+01-08-2026 @ 10:57:11 - Setting Featured Image. URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/01/167113864-14d59cf5-1233-4053-8193-070413ea3434.jpeg
+01-08-2026 @ 10:57:11 - Attachment ID:8039806012494
+01-08-2026 @ 10:57:12 - Row :9 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :10 - Parsing item.
+01-08-2026 @ 10:57:12 - Row :10 - Parsing failed. Reason: Importing Product(ID) conflicts with an existing post. ID: 8039806012494
+01-08-2026 @ 10:57:12 - Preparing for import.
+01-08-2026 @ 10:57:12 - Row :11 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012495
+01-08-2026 @ 10:57:12 - Row :11 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012495
+01-08-2026 @ 10:57:12 - Row :11 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :12 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012496
+01-08-2026 @ 10:57:12 - Row :12 - Processing item.
+01-08-2026 @ 10:57:12 - Found variable product object. ID:8039806012496
+01-08-2026 @ 10:57:12 - Row :12 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :13 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012498
+01-08-2026 @ 10:57:12 - Row :13 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012498
+01-08-2026 @ 10:57:12 - Row :13 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :14 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012499
+01-08-2026 @ 10:57:12 - Row :14 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012499
+01-08-2026 @ 10:57:12 - Row :14 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :15 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012500
+01-08-2026 @ 10:57:12 - Row :15 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012500
+01-08-2026 @ 10:57:12 - Row :15 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :16 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012501
+01-08-2026 @ 10:57:12 - Row :16 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012501
+01-08-2026 @ 10:57:12 - Row :16 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :17 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012502
+01-08-2026 @ 10:57:12 - Row :17 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012502
+01-08-2026 @ 10:57:12 - Row :17 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :18 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012503
+01-08-2026 @ 10:57:12 - Row :18 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012503
+01-08-2026 @ 10:57:12 - Row :18 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :19 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012504
+01-08-2026 @ 10:57:12 - Row :19 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012504
+01-08-2026 @ 10:57:12 - Row :19 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :20 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012505
+01-08-2026 @ 10:57:12 - Row :20 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012505
+01-08-2026 @ 10:57:12 - Row :20 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Preparing for import.
+01-08-2026 @ 10:57:12 - Row :21 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012506
+01-08-2026 @ 10:57:12 - Row :21 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012506
+01-08-2026 @ 10:57:12 - Row :21 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :22 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012507
+01-08-2026 @ 10:57:12 - Row :22 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012507
+01-08-2026 @ 10:57:12 - Row :22 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :23 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012508
+01-08-2026 @ 10:57:12 - Row :23 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012508
+01-08-2026 @ 10:57:12 - Row :23 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :24 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012509
+01-08-2026 @ 10:57:12 - Row :24 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012509
+01-08-2026 @ 10:57:12 - Row :24 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :25 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012510
+01-08-2026 @ 10:57:12 - Row :25 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012510
+01-08-2026 @ 10:57:12 - Row :25 - Product imported successfully.
+01-08-2026 @ 10:57:12 - Row :26 - Parsing item.
+01-08-2026 @ 10:57:12 - Importing as new product ID:8039806012511
+01-08-2026 @ 10:57:12 - Row :26 - Processing item.
+01-08-2026 @ 10:57:12 - Found variation product object. ID:8039806012511
+01-08-2026 @ 10:57:13 - Row :26 - Product imported successfully.
+01-08-2026 @ 10:57:13 - Row :27 - Parsing item.
+01-08-2026 @ 10:57:13 - Importing as new product ID:8039806012512
+01-08-2026 @ 10:57:13 - Row :27 - Processing item.
+01-08-2026 @ 10:57:13 - Found variation product object. ID:8039806012512
+01-08-2026 @ 10:57:13 - Row :27 - Product imported successfully.
+01-08-2026 @ 10:57:13 - Row :28 - Parsing item.
+01-08-2026 @ 10:57:13 - Importing as new product ID:8039806012513
+01-08-2026 @ 10:57:13 - Row :28 - Processing item.
+01-08-2026 @ 10:57:13 - Found variation product object. ID:8039806012513
+01-08-2026 @ 10:57:13 - Row :28 - Product imported successfully.
+01-08-2026 @ 10:57:13 - Row :29 - Parsing item.
+01-08-2026 @ 10:57:13 - Importing as new product ID:8039806012514
+01-08-2026 @ 10:57:13 - Row :29 - Processing item.
+01-08-2026 @ 10:57:13 - Found variable product object. ID:8039806012514
+01-08-2026 @ 10:57:13 - Setting Featured Image. URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/03/wtch1.webp
+01-08-2026 @ 10:57:14 - Attachment ID:8039806012515
+01-08-2026 @ 10:57:14 - Setting Gallery Images.
+01-08-2026 @ 10:57:14 - Image URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/01/167113861-531ebbcd-f9b5-4c18-b5c7-a878d5017ca2.jpeg
+01-08-2026 @ 10:57:14 - Attachment ID:8039806012516
+01-08-2026 @ 10:57:14 - Image URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/03/wtch1.webp
+01-08-2026 @ 10:57:14 - Attachment ID:8039806012515
+01-08-2026 @ 10:57:14 - Image URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/03/wtch1.webp
+01-08-2026 @ 10:57:14 - Attachment ID:8039806012515
+01-08-2026 @ 10:57:14 - Image URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/03/wtch1.webp
+01-08-2026 @ 10:57:14 - Attachment ID:8039806012515
+01-08-2026 @ 10:57:14 - Image URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/01/292839.jpg
+01-08-2026 @ 10:57:14 - Attachment ID:9159
+01-08-2026 @ 10:57:14 - Image URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/01/292839.jpg
+01-08-2026 @ 10:57:14 - Attachment ID:9159
+01-08-2026 @ 10:57:14 - Image URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/01/292839.jpg
+01-08-2026 @ 10:57:14 - Attachment ID:9159
+01-08-2026 @ 10:57:14 - Image URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/01/292839.jpg
+01-08-2026 @ 10:57:14 - Attachment ID:9159
+01-08-2026 @ 10:57:14 - Image URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/01/167113811-0be977aa-edfe-4a09-b36d-a62f02de4a29.jpeg
+01-08-2026 @ 10:57:15 - Attachment ID:8039806012517
+01-08-2026 @ 10:57:15 - Image URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/01/167113811-0be977aa-edfe-4a09-b36d-a62f02de4a29.jpeg
+01-08-2026 @ 10:57:15 - Attachment ID:8039806012517
+01-08-2026 @ 10:57:15 - Image URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/01/167113811-0be977aa-edfe-4a09-b36d-a62f02de4a29.jpeg
+01-08-2026 @ 10:57:15 - Attachment ID:8039806012517
+01-08-2026 @ 10:57:15 - Image URL:https://wordpress-319567-5178156.cloudwaysapps.com/wp-content/uploads/2025/01/167113801-fd8243b7-8465-4f82-86c1-2c54797fe296.jpeg
+01-08-2026 @ 10:57:16 - Attachment ID:8039806012518
+01-08-2026 @ 10:57:16 - Row :29 - Product imported successfully.
+01-08-2026 @ 10:57:16 - Row :30 - Parsing item.
+01-08-2026 @ 10:57:16 - Row :30 - Parsing failed. Reason: Importing Product(ID) conflicts with an existing post. ID: 8039806012515
+01-08-2026 @ 10:57:16 - Preparing for import.
+01-08-2026 @ 10:57:16 - Row :31 - Parsing item.
+01-08-2026 @ 10:57:16 - Row :31 - Parsing failed. Reason: Importing Product(ID) conflicts with an existing post. ID: 8039806012516
+01-08-2026 @ 10:57:16 - Row :32 - Parsing item.
+01-08-2026 @ 10:57:16 - Row :32 - Parsing failed. Reason: Importing Product(ID) conflicts with an existing post. ID: 8039806012517
+01-08-2026 @ 10:57:16 - Row :33 - Parsing item.
+01-08-2026 @ 10:57:16 - Row :33 - Parsing failed. Reason: Importing Product(ID) conflicts with an existing post. ID: 8039806012518
+01-08-2026 @ 10:57:16 - Row :34 - Parsing item.
+01-08-2026 @ 10:57:16 - Importing as new product ID:8039806012519
+01-08-2026 @ 10:57:16 - Row :34 - Processing item.
+01-08-2026 @ 10:57:16 - Found variation product object. ID:8039806012519
+01-08-2026 @ 10:57:16 - Row :34 - Product imported successfully.
+01-08-2026 @ 10:57:16 - Row :35 - Parsing item.
+01-08-2026 @ 10:57:16 - Importing as new product ID:8039806012524
+01-08-2026 @ 10:57:16 - Row :35 - Processing item.
+01-08-2026 @ 10:57:16 - Found simple product object. ID:8039806012524
+01-08-2026 @ 10:57:17 - Row :35 - Product imported successfully.
+01-08-2026 @ 10:57:17 - Row :36 - Parsing item.
+01-08-2026 @ 10:57:17 - Importing as new product ID:8039806012525
+01-08-2026 @ 10:57:17 - Row :36 - Processing item.
+01-08-2026 @ 10:57:17 - Found simple product object. ID:8039806012525
+01-08-2026 @ 10:57:17 - Row :36 - Product imported successfully.
+01-08-2026 @ 10:57:17 - Row :37 - Parsing item.
+01-08-2026 @ 10:57:17 - Importing as new product ID:8039806012541
+01-08-2026 @ 10:57:17 - Row :37 - Processing item.
+01-08-2026 @ 10:57:17 - Found external product object. ID:8039806012541
+01-08-2026 @ 10:57:18 - Row :37 - Product imported successfully.
+01-08-2026 @ 10:57:18 - Row :38 - Parsing item.
+01-08-2026 @ 10:57:18 - Importing as new product ID:8039806012542
+01-08-2026 @ 10:57:18 - Row :38 - Processing item.
+01-08-2026 @ 10:57:18 - Found simple product object. ID:8039806012542
+01-08-2026 @ 10:57:18 - Row :38 - Product imported successfully.
+01-08-2026 @ 10:57:18 - Row :39 - Parsing item.
+01-08-2026 @ 10:57:18 - Importing as new product ID:8039806012543
+01-08-2026 @ 10:57:18 - Row :39 - Processing item.
+01-08-2026 @ 10:57:18 - Found variable product object. ID:8039806012543
+01-08-2026 @ 10:57:19 - Row :39 - Product imported successfully.
+01-08-2026 @ 10:57:19 - Row :40 - Parsing item.
+01-08-2026 @ 10:57:19 - Importing as new product ID:8039806012544
+01-08-2026 @ 10:57:19 - Row :40 - Processing item.
+01-08-2026 @ 10:57:19 - Found variation product object. ID:8039806012544
+01-08-2026 @ 10:57:19 - Row :40 - Product imported successfully.
+01-08-2026 @ 10:57:19 - Preparing for import.
+01-08-2026 @ 10:57:19 - Row :41 - Parsing item.
+01-08-2026 @ 10:57:19 - Importing as new product ID:8039806012545
+01-08-2026 @ 10:57:19 - Row :41 - Processing item.
+01-08-2026 @ 10:57:19 - Found variation product object. ID:8039806012545
+01-08-2026 @ 10:57:19 - Row :41 - Product imported successfully.
+01-08-2026 @ 10:57:19 - Row :42 - Parsing item.
+01-08-2026 @ 10:57:19 - Importing as new product ID:8039806012546
+01-08-2026 @ 10:57:19 - Row :42 - Processing item.
+01-08-2026 @ 10:57:19 - Found variation product object. ID:8039806012546
+01-08-2026 @ 10:57:19 - Row :42 - Product imported successfully.
+01-08-2026 @ 10:57:19 - ---[ Import ended at 2026-01-08 10:57:19]---

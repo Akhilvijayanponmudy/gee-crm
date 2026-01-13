@@ -1,0 +1,23 @@
+01-05-2026 @ 09:47:47 - ---[ New import started at 2026-01-05 09:47:47 ] PHP Memory: 256 MB, WP Memory: 40 MB
+01-05-2026 @ 09:47:47 - Preparing for import.
+01-05-2026 @ 09:47:47 - Row :1 - Parsing item.
+01-05-2026 @ 09:47:47 - Row :1 - Parsing failed. Reason: User with same Email already exists. Email: akhilvijayan@mozilor.com
+01-05-2026 @ 09:47:47 - Row :2 - Parsing item.
+01-05-2026 @ 09:47:47 - Row :2 - Processing item.
+01-05-2026 @ 09:47:47 - Processing users.
+01-05-2026 @ 09:47:47 - > &#8220;4&#8221; User imported successfully. ID:4
+01-05-2026 @ 09:47:47 - > Finished importing user 4
+01-05-2026 @ 09:47:47 - Row :2 - User imported successfully.
+01-05-2026 @ 09:47:47 - Row :3 - Parsing item.
+01-05-2026 @ 09:47:47 - Row :3 - Processing item.
+01-05-2026 @ 09:47:47 - Processing users.
+01-05-2026 @ 09:47:47 - > &#8220;5&#8221; User imported successfully. ID:5
+01-05-2026 @ 09:47:47 - > Finished importing user 5
+01-05-2026 @ 09:47:47 - Row :3 - User imported successfully.
+01-05-2026 @ 09:47:47 - Row :4 - Parsing item.
+01-05-2026 @ 09:47:47 - Row :4 - Processing item.
+01-05-2026 @ 09:47:47 - Processing users.
+01-05-2026 @ 09:47:47 - > &#8220;6&#8221; User imported successfully. ID:6
+01-05-2026 @ 09:47:47 - > Finished importing user 6
+01-05-2026 @ 09:47:47 - Row :4 - User imported successfully.
+01-05-2026 @ 09:47:47 - ---[ Import ended at 2026-01-05 09:47:47]---

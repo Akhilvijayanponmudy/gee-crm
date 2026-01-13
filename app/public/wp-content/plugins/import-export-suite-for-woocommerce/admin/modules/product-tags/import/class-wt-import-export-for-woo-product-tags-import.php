@@ -1,0 +1,497 @@
+<?php
+/**
+ * Import class
+ *
+ * @package  import-export-for-woocommerce
+ */
+
+if ( ! defined( 'WPINC' ) ) {
+	exit;
+}
+
+/**
+ * Class Wt_Import_Export_For_Woo_Product_Tags_Import Class.
+ */
+#[AllowDynamicProperties]
+class Wt_Import_Export_For_Woo_Product_Tags_Import {
+
+
+	/**
+	 * Parent module object
+	 *
+	 * @var object
+	 */
+	public $parent_module = null;
+
+	/**
+	 * Parsed data
+	 *
+	 * @var array
+	 */
+	public $parsed_data = array();
+
+	/**
+	 * Is update
+	 *
+	 * @var boolean
+	 */
+	public $is_update;
+
+	/**
+	 * Taxonomy type
+	 *
+	 * @var string
+	 */
+	public $taxonomy_type;
+
+	/**
+	 * Import results
+	 *
+	 * @var array
+	 */
+	public $import_results = array();
+
+	/**
+	 * Row
+	 *
+	 * @var int
+	 */
+	public $row;
+
+	/**
+	 * Constructor
+	 *
+	 * @param object $parent_object Parent module object.
+	 */
+	public function __construct( $parent_object ) {
+
+		$this->parent_module = $parent_object;
+
+		/**
+		 * Filter the default columns for product tags.
+		 *
+		 * @param array $taxonomy_post_defaults Default columns for product tags.
+		 * @return array
+		 * @since 1.0.0
+		 */
+		$this->taxonomy_post_defaults = apply_filters(
+			'wt_tags_csv_product_post_columns',
+			array(
+				'term_id'     => 'term_id',
+				'name'        => 'name',
+				'slug'        => 'slug',
+				'description' => 'description',
+			)
+		);
+	}//end __construct()
+
+	/**
+	 * Hf_log_data_change
+	 *
+	 * @param string $content Content.
+	 * @param string $data   Data.
+	 */
+	public function hf_log_data_change( $content = 'tags-csv-import', $data = '' ) {
+
+		Wt_Import_Export_For_Woo_Logwriter::write_log( $this->parent_module->module_base, 'import', $data );
+	}//end hf_log_data_change()
+
+	/**
+	 * Import data
+	 *
+	 * @param  array   $import_data Array of data to import.
+	 * @param  array   $form_data  Form data.
+	 * @param  integer $batch_offset Batch offset.
+	 * @param  boolean $is_last_batch Is last batch.
+	 * @return array
+	 */
+	public function prepare_data_to_import( $import_data, $form_data, $batch_offset, $is_last_batch ) {
+
+		$this->is_update     = isset( $form_data['advanced_form_data']['wt_iew_merge'] ) ? $form_data['advanced_form_data']['wt_iew_merge'] : 0;
+		$this->taxonomy_type = 'product_tag';
+
+		Wt_Import_Export_For_Woo_Logwriter::write_log( $this->parent_module->module_base, 'import', 'Preparing for import.' );
+
+		$success = 0;
+		$failed  = 0;
+		$msg     = 'Tag imported successfully.';
+		if ( 0 !== $batch_offset ) {
+			$start_row_count    = get_option( 'wt_ier_import_row_count', null );
+			$complete_row_count = get_option( 'wt_ier_import_row_complete_count', null );
+			if ( $start_row_count === $complete_row_count ) {
+				$skip_on_resume = $start_row_count + 1;
+			} else {
+				$skip_on_resume = $start_row_count;
+			}
+		}
+
+		foreach ( $import_data as $key => $data ) {
+			$row = $batch_offset + $key + 1;
+			if ( isset( $skip_on_resume ) && $skip_on_resume > $key ) {
+				continue;
+			}
+			update_option( 'wt_ier_import_row_count', $key );
+			Wt_Import_Export_For_Woo_Logwriter::write_log( $this->parent_module->module_base, 'import', "Row :$row - Parsing item." );
+			$parsed_data = $this->parse_product_tags( $data, $this->is_update, $this->taxonomy_type );
+			if ( ! is_wp_error( $parsed_data ) ) {
+				Wt_Import_Export_For_Woo_Logwriter::write_log( $this->parent_module->module_base, 'import', "Row :$row - Processing item." );
+				$result = $this->process_product_tags( $parsed_data, $this->is_update, $this->taxonomy_type );
+
+				if ( ! is_wp_error( $result ) ) {
+					if ( isset( $result['status'] ) && 'updated' === $result['status'] ) {
+						$msg = 'Tag updated successfully.';
+					}
+
+					$this->import_results[ $row ] = array(
+						'row'        => $row,
+						'message'    => $msg,
+						'status'     => true,
+						'status_msg' => __( 'Success' ),
+						'post_id'    => $result['id'],
+						'post_link'  => Wt_Import_Export_For_Woo_Product_Tags::get_item_link_by_id( $result['id'] ),
+					);
+					Wt_Import_Export_For_Woo_Logwriter::write_log( $this->parent_module->module_base, 'import', "Row :$row - " . $msg );
+					++$success;
+				} else {
+					$this->import_results[ $row ] = array(
+						'row'        => $row,
+						'message'    => $result->get_error_message(),
+						'status'     => false,
+						'status_msg' => __( 'Failed/Skipped' ),
+						'post_id'    => '',
+						'post_link'  => array(
+							'title'    => __( 'Untitled' ),
+							'edit_url' => false,
+						),
+					);
+					Wt_Import_Export_For_Woo_Logwriter::write_log( $this->parent_module->module_base, 'import', "Row :$row - Prosessing failed. Reason: " . $result->get_error_message() );
+					++$failed;
+				}
+			} else {
+				$this->import_results[ $row ] = array(
+					'row'        => $row,
+					'message'    => $parsed_data->get_error_message(),
+					'status'     => false,
+					'status_msg' => __( 'Failed/Skipped' ),
+					'post_id'    => '',
+					'post_link'  => array(
+						'title'    => __( 'Untitled' ),
+						'edit_url' => false,
+					),
+				);
+				Wt_Import_Export_For_Woo_Logwriter::write_log( $this->parent_module->module_base, 'import', "Row :$row - Parsing failed. Reason: " . $parsed_data->get_error_message() );
+				++$failed;
+			}
+			update_option( 'wt_ier_import_row_complete_count', $key );
+			unset( $data, $parsed_data );
+		}
+
+		$this->clean_after_import();
+
+		$import_response = array(
+			'total_success' => $success,
+			'total_failed'  => $failed,
+			'log_data'      => $this->import_results,
+		);
+
+		return $import_response;
+	}//end prepare_data_to_import()
+
+	/**
+	 * Parse data
+	 *
+	 * @param  array   $data Data.
+	 * @param  boolean $is_update Is update.
+	 * @param  string  $taxonomy_type Taxonomy type.
+	 * @return array
+	 */
+	public function parse_product_tags( $data, $is_update, $taxonomy_type ) {
+		try {
+
+			/**
+			 * Filter the data before parsing.
+			 *
+			 * @param array $data Data.
+			 * @return array
+			 * @since 1.0.0
+			 */
+			$data = apply_filters( 'wt_woocommerce_product_tags_importer_pre_parse_data', $data );
+
+			$item = $data['mapping_fields'];
+
+			return $item;
+		} catch ( Exception $e ) {
+			return new WP_Error( 'woocommerce_product_importer_error', $e->getMessage(), array( 'status' => $e->getCode() ) );
+		}
+	}//end parse_product_tags()
+
+	/**
+	 * Process product tags
+	 *
+	 * @param  array   $post Data.
+	 * @param  boolean $is_update Is update.
+	 * @param  string  $taxonomy_type Taxonomy type.
+	 * @return array
+	 */
+	public function process_product_tags( $post, $is_update, $taxonomy_type ) {
+		try {
+
+			$term_data = $this->process_taxonomy_by_type( $post, $is_update, $taxonomy_type );
+
+			return $term_data;
+		} catch ( Exception $e ) {
+			return new WP_Error( 'woocommerce_product_importer_error', $e->getMessage(), array( 'status' => $e->getCode() ) );
+		}
+	}//end process_product_tags()
+
+	/**
+	 * Process taxonomy by type
+	 *
+	 * @param  array   $data Data.
+	 * @param  boolean $is_update Is update.
+	 * @param  string  $taxonomy_type Taxonomy type.
+	 * @return array
+	 */
+	public function process_taxonomy_by_type( $data, $is_update = 0, $taxonomy_type = 'product_cat' ) {
+
+		$parent_id = '';
+		$name      = isset( $data['name'] ) ? $data['name'] : '';
+		$slug      = isset( $data['slug'] ) ? $data['slug'] : '';
+
+		$term_id      = isset( $data['term_id'] ) ? $data['term_id'] : '';
+		$description  = isset( $data['description'] ) ? $data['description'] : '';
+		$display_type = isset( $data['display_type'] ) ? $data['display_type'] : '';
+
+		$parent_id = ( isset( $data['parent'] ) && ( 0 !== $data['parent'] ) ) ? $data['parent'] : '';
+
+		global $wpdb;
+
+		switch ( $taxonomy_type ) {
+
+			case 'product_cat':
+				$tax_type          = 'product_cat';
+				$term_meta_tbl_key = 'orginal_term_id';
+				break;
+			case 'product_tag':
+				$tax_type          = 'product_tag';
+				$term_meta_tbl_key = 'orginal_product_tag_term_id';
+				break;
+		}
+		$pid = '';
+		if ( $parent_id ) {
+			$pid = $parent_id;
+		}
+		$term_name     = $name;
+		$taxonomy_name = $tax_type;
+		$related_data  = array(
+			'name'        => $name,
+			'description' => $description,
+			'slug'        => strtolower( rawurlencode( $slug ) ),
+		);
+		if ( $pid ) {
+			$related_data['parent'] = $pid;
+		}
+		$chk = $wpdb->get_row( $wpdb->prepare( "SELECT t.term_id, t.slug FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy as tt ON tt.term_id = t.term_id WHERE t.slug = %s and tt.taxonomy = %s ORDER BY t.term_id", rawurlencode( $slug ), $tax_type ), ARRAY_A );
+
+		$tid    = '';
+		$status = '';
+		if ( isset( $chk['term_id'] ) ) {
+			$tid = $chk['term_id'];
+		}
+
+		if ( 'product_tag' === $taxonomy_type || 'product_cat' === $taxonomy_type ) {
+
+			if ( '' === $tid ) {
+
+				if ( ! empty( $data['slug'] ) || '' !== $name ) {
+
+					if ( 'product_tag' === $taxonomy_type || 'product_cat' === $taxonomy_type ) {
+
+						$res = $wpdb->get_results( $wpdb->prepare( "SELECT term_id FROM $wpdb->termmeta WHERE meta_key = %s and meta_value = %d ORDER BY meta_key,meta_id", $term_meta_tbl_key, $parent_id ), ARRAY_A );
+
+						$term_id = $term_id;
+
+						if ( ! empty( $res ) ) {
+							$pid = $res[0]['term_id'];
+						}
+						$related_data['parent'] = $pid;
+					}
+
+					if ( ! empty( $parent_id ) && empty( $res ) ) {
+
+						$status = array(
+							'name'   => $name,
+							'status' => 'Data skipped parent not found',
+						);
+						return new WP_Error( 'data-error', '> Data skipped parent not found' );
+					} else {
+
+						$cid = wp_insert_term( $term_name, $taxonomy_name, $related_data );
+						if ( is_wp_error( $cid ) ) {
+							return new WP_Error( 'data-error', $cid->get_error_message() );
+						}
+
+						$cid = $cid['term_id'];
+						if ( ! empty( $term_id ) ) {
+							update_term_meta( $cid, $term_meta_tbl_key, $term_id );
+						}
+
+						if ( 'product_cat' === $taxonomy_type ) {
+
+							$thumbnail = isset( $data['thumbnail'] ) ? $data['thumbnail'] : '';
+							if ( '' !== $thumbnail ) {
+
+								$image_url = $data['thumbnail'];
+								$attach_id = $this->image_library_attachment( $image_url );
+								update_term_meta( $cid, 'thumbnail_id', absint( $attach_id ) );
+							}
+						}
+						if ( ! empty( $display_type ) ) {
+							update_term_meta( $cid, 'display_type', $display_type );
+						}
+						if ( $tid ) {
+							$this->wt_update_tag_yoast_data( $data, $tid );
+							$this->wt_update_tag_meta( $data, $tid );
+						}
+						$status = array(
+							'id'     => $cid,
+							'name'   => $name,
+							'status' => 'imported',
+						);
+						unset( $cid );
+					}
+				} else {
+					return new WP_Error( 'data-error', 'Missing tag details to insert' );
+				}
+			} else {
+
+				if ( $is_update ) {
+					$update = wp_update_term( $tid, $taxonomy_name, $related_data );
+					if ( 'product_cat' === $taxonomy_type ) {
+						$thumbnail = isset( $data['thumbnail'] ) ? $data['thumbnail'] : '';
+						if ( '' !== $thumbnail ) {
+
+							$thumbnail_id      = get_term_meta( $tid, 'thumbnail_id', true );
+							$thumbnail_url     = wp_get_attachment_url( $thumbnail_id );
+							$existing_filename = basename( $thumbnail_url );
+
+							$image_url        = $thumbnail;
+							$current_filename = basename( $image_url );
+							if ( $current_filename !== $existing_filename ) {
+
+								$attach_id = $this->image_library_attachment( $image_url );
+
+								update_term_meta( $tid, 'thumbnail_id', absint( $attach_id ) );
+							}
+						}
+					}
+
+					if ( ! empty( $display_type ) ) {
+						update_term_meta( $tid, 'display_type', $display_type );
+					}
+					if ( $tid ) {
+						$this->wt_update_tag_yoast_data( $data, $tid );
+						$this->wt_update_tag_meta( $data, $tid );
+					}
+					$status = array(
+						'id'     => $tid,
+						'name'   => $name,
+						'status' => 'updated',
+					);
+				} else {
+					return new WP_Error( 'data-exist', '> Taxonomy skipped - already exist' );
+				}
+				if ( $term_id ) {
+					update_term_meta( $tid, $term_meta_tbl_key, $term_id );
+				}
+			}
+		}
+
+		unset( $chk );
+		return $status;
+	}//end process_taxonomy_by_type()
+
+	/**
+	 * Method used for update tag yoast data
+	 *
+	 * @param array $data Data.
+	 * @param int   $term_id Term id.
+	 */
+	public function wt_update_tag_yoast_data( $data, $term_id ) {
+
+		if ( class_exists( 'WPSEO_Options' ) ) {
+
+			if ( ! empty( $data['meta:_yoast_data'] ) ) {
+				$yoast_data                                   = (array) Wt_Import_Export_For_Woo_Common_Helper::wt_unserialize_safe( $data['meta:_yoast_data'] ); // nosemgrep.
+				$yoast_data_option                            = get_option( 'wpseo_taxonomy_meta' ) ? get_option( 'wpseo_taxonomy_meta' ) : array();
+				$yoast_data_option['product_tag'][ $term_id ] = $yoast_data;
+				update_option( 'wpseo_taxonomy_meta', $yoast_data_option );
+			}
+			unset( $data['meta:_yoast_data'] );
+		}
+	}//end wt_update_tag_yoast_data()
+
+	/**
+	 * Method used for update tag meta
+	 *
+	 * @param array $data Data.
+	 * @param int   $term_id Term id.
+	 */
+	public function wt_update_tag_meta( $data, $term_id ) {
+
+		foreach ( $data as $tm_key => $tm_value ) {
+			if ( 'meta:' === substr( $tm_key, 0, 5 ) ) {
+				$tag_meta_key = substr( $tm_key, 5 );
+				update_term_meta( $term_id, $tag_meta_key, $tm_value );
+			}
+		}
+	}//end wt_update_tag_meta()
+
+	/**
+	 * Method used for image library attachment
+	 *
+	 * @param string $image_url Image url.
+	 * @return int
+	 */
+	public function image_library_attachment( $image_url ) {
+
+		$upload_dir = wp_upload_dir();
+
+		$image_data = file_get_contents( $image_url );
+
+		$filename = basename( $image_url );
+
+		if ( wp_mkdir_p( $upload_dir['path'] ) ) {
+			$file = $upload_dir['path'] . '/' . $filename;
+		} else {
+			$file = $upload_dir['basedir'] . '/' . $filename;
+		}
+
+		file_put_contents( $file, $image_data );
+
+		$wp_filetype = wp_check_filetype( $filename, null );
+
+		$attachment = array(
+			'post_mime_type' => $wp_filetype['type'],
+			'post_title'     => sanitize_file_name( $filename ),
+			'post_content'   => '',
+			'post_status'    => 'inherit',
+		);
+
+		$attach_id = wp_insert_attachment( $attachment, $file );
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+		$attach_data = wp_generate_attachment_metadata( $attach_id, $file );
+		wp_update_attachment_metadata( $attach_id, $attach_data );
+
+		return $attach_id;
+	}//end image_library_attachment()
+
+	/**
+	 * Clean after import
+	 */
+	public function clean_after_import() {
+		wp_suspend_cache_invalidation( false );
+		wp_defer_term_counting( false );
+		wp_defer_comment_counting( false );
+	}//end clean_after_import()
+}

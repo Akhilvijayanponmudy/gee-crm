@@ -1,0 +1,13 @@
+01-05-2026 @ 11:25:51 - ---[ New import started at 2026-01-05 11:25:51 ] PHP Memory: 256 MB, WP Memory: 40 MB
+01-05-2026 @ 11:25:51 - Preparing for import.
+01-05-2026 @ 11:25:51 - Row :1 - Parsing item.
+01-05-2026 @ 11:25:51 - Importing as new product ID:62
+01-05-2026 @ 11:25:51 - Row :1 - Processing item.
+01-05-2026 @ 11:25:51 - Found simple product object. ID:62
+01-05-2026 @ 11:25:51 - Row :1 - Processing failed. Reason: Invalid or duplicated SKU.
+01-05-2026 @ 11:25:51 - Row :2 - Parsing item.
+01-05-2026 @ 11:25:51 - Importing as new product ID:63
+01-05-2026 @ 11:25:51 - Row :2 - Processing item.
+01-05-2026 @ 11:25:51 - Found simple product object. ID:63
+01-05-2026 @ 11:25:51 - Row :2 - Processing failed. Reason: Invalid or duplicated SKU.
+01-05-2026 @ 11:25:51 - ---[ Import ended at 2026-01-05 11:25:51]---

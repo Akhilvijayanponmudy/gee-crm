@@ -102,6 +102,7 @@ class Gee_Woo_CRM_Admin {
 		if ( strpos( $hook, 'gee-woo-crm' ) === false ) {
 			return;
 		}
+		
 		wp_enqueue_style( 'gee-woo-crm-admin', GEE_WOO_CRM_URL . 'assets/css/admin.css', array(), GEE_WOO_CRM_VERSION, 'all' );
 	}
 
@@ -111,6 +112,7 @@ class Gee_Woo_CRM_Admin {
 			return;
 		}
 		
+<<<<<<< HEAD
 		// Check if we're on campaigns or email-templates page (need editor)
 		$page_slug = isset( $_GET['page'] ) ? sanitize_text_field( $_GET['page'] ) : '';
 		$view = isset( $_GET['view'] ) ? sanitize_text_field( $_GET['view'] ) : 'dashboard';
@@ -126,6 +128,13 @@ class Gee_Woo_CRM_Admin {
 		// Enqueue WordPress editor scripts for campaigns and email-templates pages
 		if ( ( $view === 'campaigns' && ( $action === 'new' || $action === 'edit' ) ) || 
 		     ( $view === 'email-templates' && ( $action === 'edit' || $action === 'use' || empty( $action ) ) ) ) {
+=======
+		$view = isset( $_GET['view'] ) ? sanitize_text_field( $_GET['view'] ) : 'dashboard';
+		$action = isset( $_GET['action'] ) ? sanitize_text_field( $_GET['action'] ) : '';
+		
+		// Enqueue WordPress editor scripts for email templates
+		if ( $view === 'email-templates' && ( $action === 'edit' || empty( $action ) ) ) {
+>>>>>>> feature/update-segments
 			// Enable rich editing
 			add_filter( 'user_can_richedit', '__return_true' );
 			
@@ -137,9 +146,13 @@ class Gee_Woo_CRM_Admin {
 			wp_tinymce_inline_scripts();
 		}
 		
+<<<<<<< HEAD
 		// Enqueue Chart.js only for dashboard if needed, or globally for the SPA feel
 		wp_enqueue_script( 'chart-js', 'https://cdn.jsdelivr.net/npm/chart.js', array(), '4.4.0', true );
 		wp_enqueue_script( 'gee-woo-crm-admin', GEE_WOO_CRM_URL . 'assets/js/admin.js', array( 'jquery', 'chart-js' ), GEE_WOO_CRM_VERSION, true );
+=======
+		wp_enqueue_script( 'gee-woo-crm-admin', GEE_WOO_CRM_URL . 'assets/js/admin.js', array( 'jquery' ), GEE_WOO_CRM_VERSION, true );
+>>>>>>> feature/update-segments
 		
 		wp_localize_script( 'gee-woo-crm-admin', 'geeWooCRM', array(
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
@@ -202,6 +215,7 @@ class Gee_Woo_CRM_Admin {
 			</div>
 		</div>
 		<div class="gee-woo-crm-wrapper">
+<<<<<<< HEAD
 			<!-- Top Navigation Bar -->
 			<div class="gee-woo-crm-top-nav">
 				<div class="gee-woo-crm-nav-container">
@@ -277,6 +291,10 @@ class Gee_Woo_CRM_Admin {
 				<div class="gee-woo-crm-content">
 					<?php $this->render_view( $page ); ?>
 				</div>
+=======
+			<div class="gee-woo-crm-content">
+				<?php $this->render_view( $page ); ?>
+>>>>>>> feature/update-segments
 			</div>
 		</div>
 		<?php
@@ -347,3 +365,4 @@ class Gee_Woo_CRM_Admin {
 		return $init;
 	}
 }
+
