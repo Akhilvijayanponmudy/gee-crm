@@ -429,7 +429,8 @@ class Gee_Woo_CRM_Segment {
                     ) < %f";
                     $clause['params'][] = $amount;
                 } elseif ( $operator === 'equals' ) {
-                    $clause['where'] = "ABS((
+                    // Use COALESCE to handle NULL (contacts with no purchases) as 0
+                    $clause['where'] = "ABS(COALESCE((
                         SELECT CAST(pm.meta_value AS DECIMAL(10,2))
                         FROM $posts_table p
                         INNER JOIN $postmeta_table pm ON p.ID = pm.post_id
@@ -447,7 +448,7 @@ class Gee_Woo_CRM_Segment {
                         )
                         ORDER BY p.post_date DESC
                         LIMIT 1
-                    ) - %f) < 0.01";
+                    ), 0) - %f) < 0.01";
                     $clause['params'][] = $amount;
                 } elseif ( $operator === 'greater_than_equal' ) {
                     $clause['where'] = "(
